@@ -1,0 +1,41 @@
+glob
+glob.h http://svn.freebsd.org/base/head/include/glob.h
+glob.c http://svn.freebsd.org/base/head/lib/libc/gen/glob.c (minimal changed)
+
+TODO: add this to repo
+bzip2 from from http://code.google.com/p/python-for-android/
+
+tokyocabinet from http://fallabs.com/tokyocabinet/
+
+changed (tcutil.c):
+
+#if defined(_SYS_LINUX_)
+  assert(tm);
+  return timegm(tm);
+#else
+  assert(tm);
+  return mktime(tm) + tcjetlag();
+#endif
+
+to
+
+#if defined(_SYS_LINUX_) && !defined(__ANDROID__)
+  assert(tm);
+  return timegm(tm);
+#else
+  assert(tm);
+  return mktime(tm) + tcjetlag();
+#endif
+
+jkyotocabinet from http://fallabs.com/kyotocabinet/
+
+tdbqry.c
+
+But I realized, when running TCTDBEX.java, that line 118 of tdbqry.c (Java_tokyocabinet_TDBQRY_search) has to be
+    (*env)->CallBooleanMethod(env, pkeys, midadd, pkey);
+instead of
+    (*env)->CallVoidMethod(env, pkeys, midadd, pkey);
+because ArrayList is returning a boolean on calling add(E e) [1] only add(int index, E element) returns nothing. 
+
+[1] http://download.oracle.com/javase/6/docs/api/java/util/ArrayList.html#add%28E%29 
+

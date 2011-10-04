@@ -1,0 +1,9 @@
+[submodule "TriplePlace/jni/jtokyocabinet"]
+	path = TriplePlace/jni/jtokyocabinet
+	url = git@github.com:white-gecko/TokyoCabinet-Android-API.git
+[submodule "TriplePlace/jni/tokyocabinet"]
+	path = TriplePlace/jni/tokyocabinet
+	url = git@github.com:white-gecko/TokyoCabinet.git
+[submodule "TriplePlace/src/tokyocabinet"]
+	path = TriplePlace/src/tokyocabinet
+	url = git@github.com:white-gecko/TokyoCabinet-Android-API.git
