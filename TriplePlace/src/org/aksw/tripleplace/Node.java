@@ -63,26 +63,26 @@ public class Node {
 		// parse nodeString
 		int length = nodeString.length();
 		
-		Log.d(TAG, "Creating new Node with nodeString: \"" + nodeString + "\"");
+		//Log.d(TAG, "Creating new Node with nodeString: \"" + nodeString + "\"");
 		
 		switch (nodeString.charAt(0)) {
 		case '<':
 			// Resource
 			type = TYPE_NAMED_RESOURCE;
 			value = nodeString.substring(1, length - 1);
-			Log.d(TAG, "Type " + type + " value: \"" + value + "\"");
+			//Log.d(TAG, "Type " + type + " value: \"" + value + "\"");
 			return;
 		case '_':
 			// BNode
 			type = TYPE_BLANK_RESOURCE;
 			value = nodeString.substring(2, length);
-			Log.d(TAG, "Type " + type + " value: \"" + value + "\"");
+			//Log.d(TAG, "Type " + type + " value: \"" + value + "\"");
 			return;
 		case '?':
 			// Variable
 			type = TYPE_VARIABLE;
 			value = nodeString.substring(1, length);
-			Log.d(TAG, "Type " + type + " value: \"" + value + "\"");
+			//Log.d(TAG, "Type " + type + " value: \"" + value + "\"");
 			return;
 		case '"':
 			// Literal
@@ -100,27 +100,27 @@ public class Node {
 				}
 				value = nodeString.substring(1, split - 1);
 				dataType = nodeString.substring(split + 3, length - 1);
-				Log.d(TAG, "Type " + type + " value: \"" + value + "\", dataType: \"" + dataType + "\"");
+				//Log.d(TAG, "Type " + type + " value: \"" + value + "\", dataType: \"" + dataType + "\"");
 				return;
 			case '"':
 				// Literal
 				type = TYPE_LITERAL;
 				value = nodeString.substring(1, length - 1);
-				Log.d(TAG, "Type " + type + " value: \"" + value + "\"");
+				//Log.d(TAG, "Type " + type + " value: \"" + value + "\"");
 				return;
 			default:
 				// Language Literal
 				type = TYPE_LANG_LITERAL;
 				split = nodeString.lastIndexOf("\"@");
 				if (split < 0) {
-					Log.v(TAG, "Unrecognized RDF-Type in string: \"" + nodeString
+					Log.e(TAG, "Unrecognized RDF-Type in string: \"" + nodeString
 					+ "\"");
 					throw new Exception("Unrecognized RDF-Type in string: \"" + nodeString
 					+ "\"");
 				}
 				value = nodeString.substring(1, split-1);
 				lang = nodeString.substring(split+3, length - 1);
-				Log.d(TAG, "Type " + type + " value: \"" + value + "\", dataType: \"" + lang + "\"");
+				//Log.d(TAG, "Type " + type + " value: \"" + value + "\", dataType: \"" + lang + "\"");
 				return;
 			}
 		default:

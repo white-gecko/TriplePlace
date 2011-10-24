@@ -89,12 +89,12 @@ public class Dictionary {
 				// Overwrite existing nodes, because it shouldn't happen
 				// if it happens the node was orphaned
 				if (dict.put(node.getNodeString(), String.valueOf(key))) {
-					Log.e(TAG,
-							"Successfully added new Node ("
-									+ node.getNodeString()
-									+ ") to Dictionary with key = " + key
-									+ ", dict has now " + dict.rnum()
-									+ " entries");
+					//Log.i(TAG,
+					//		"Successfully added new Node ("
+					//				+ node.getNodeString()
+					//				+ ") to Dictionary with key = " + key
+					//				+ ", dict has now " + dict.rnum()
+					//				+ " entries");
 					node.setId(key);
 					if (dict.rnum() != dictInv.rnum()) {
 						Log.w(TAG,

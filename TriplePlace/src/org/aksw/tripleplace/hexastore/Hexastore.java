@@ -27,7 +27,6 @@ public class Hexastore implements Store {
 	}
 	
 	public void addTriple(Triple triple) throws IOException {
-		Log.v(TAG, "Adding Triple to Hexastore");
 		
 		Node[] nodes = triple.getNodes();
 		long[] nodeIds = new long[nodes.length];
@@ -35,7 +34,7 @@ public class Hexastore implements Store {
 		for (int i = 0; i < nodes.length; i++) {
 			if (nodes[i].getId() == 0) {
 				// add Node to dictionary
-				Log.v(TAG, "Adding Node to Dict");
+				//Log.v(TAG, "Adding Node to Dict");
 				try {
 					dict.addNode(nodes[i]);
 				} catch (Exception e) {
@@ -44,7 +43,7 @@ public class Hexastore implements Store {
 				}
 			}
 			
-			Log.v(TAG, "Adding Node has ID: " + nodes[i].getId());
+			//Log.v(TAG, "Adding Node has ID: " + nodes[i].getId());
 			nodeIds[i] = nodes[i].getId();
 		}
 		

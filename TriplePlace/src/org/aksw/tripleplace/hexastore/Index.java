@@ -60,7 +60,7 @@ public class Index {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			DataOutputStream dos = new DataOutputStream(bos);
 
-			Log.v(TAG, "Adding Triple to index");
+			//Log.v(TAG, "Adding Triple to index");
 
 			for (int i = 0; i < 2; i++) {
 				dos.writeLong(nodes[order[i]]);
