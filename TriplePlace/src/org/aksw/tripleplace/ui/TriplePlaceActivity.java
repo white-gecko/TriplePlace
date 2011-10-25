@@ -7,6 +7,8 @@ import org.aksw.tripleplace.hexastore.Hexastore;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,34 +27,52 @@ public class TriplePlaceActivity extends Activity {
 
 		TextView text = (TextView) this.findViewById(R.id.hello);
 		Button go = (Button) this.findViewById(R.id.start);
-		go.setOnClickListener(new GoClick(text));
+		Handler handler = new MyHandler(text);
+
+		go.setOnClickListener(new GoClick(handler));
+	}
+
+	private class MyHandler extends Handler {
+		private TextView text;
+
+		public MyHandler(TextView text) {
+			this.text = text;
+		}
+
+		public void handleMessage(Message msg) {
+			if (msg.what == 1) {
+				String textString = (String) msg.obj;
+				text.setText(textString);
+				Log.v(TAG, "Got Message");
+			} else {
+				Log.v(TAG, "Got different Message");
+			}
+		}
 	}
 
 	private class GoClick implements OnClickListener {
 
-		private TextView text;
+		private Handler handler;
 
-		public GoClick(TextView text) {
-			this.text = text;
+		public GoClick(Handler handler) {
+			this.handler = handler;
 		}
 
 		public void onClick(View v) {
 			String path = getFilesDir().getAbsolutePath();
-			HexaBenchmark b = new HexaBenchmark(path, text);
+			HexaBenchmark b = new HexaBenchmark(path, handler);
 			b.start();
-			text.setText("läuft ...");
+
+			handler.sendMessage(handler.obtainMessage(1, "läuft ..."));
 		}
 	}
 
 	private class HexaBenchmark extends Thread {
 
-		private String path;
-		private TextView text;
-		private long end;
+		private Handler handler;
 
-		public HexaBenchmark(String path, TextView text) {
-			this.text = text;
-			this.path = path;
+		public HexaBenchmark(String path, Handler handler) {
+			this.handler = handler;
 		}
 
 		public void run() {
@@ -84,10 +104,11 @@ public class TriplePlaceActivity extends Activity {
 			end = (System.currentTimeMillis() - start);
 			Log.v("Benchmark", "Status(" + end + ") done");
 
-			text.setText("Status " + 1000 * 2 * 2 + " Tripel in " + end
-					+ " ms hinzugefügt, das sind " + (end / 1000) + " s und "
-					+ (end / 1000) / 60 + " min done");
-			this.end = end;
+			handler.sendMessage(handler.obtainMessage(1, "Status " + 1000 * 2
+					* 2 + " Tripel in " + end + " ms hinzugefügt, das sind "
+					+ (end / 1000) + " s und " + (end / 1000) / 60
+					+ " min done"));
+			// this.end = end;
 		}
 	}
 
