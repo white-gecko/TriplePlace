@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="386.73999"
+   height="386.73999"
+   id="svg5430"
+   version="1.1"
+   inkscape:version="0.48.1 r9760"
+   sodipodi:docname="logo_v6_icon.svg"
+   inkscape:export-filename="/home/natanael/Dokumente/Projekte/TriplePlace/logo/logo_v6.png"
+   inkscape:export-xdpi="217.42"
+   inkscape:export-ydpi="217.42">
+  <defs
+     id="defs5432">
+    <filter
+       id="filter5317"
+       inkscape:label="Fancy blur"
+       inkscape:menu="Blurs"
+       inkscape:menu-tooltip="Smooth colorized contour which allows desaturation and hue rotation"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         id="feGaussianBlur5319"
+         stdDeviation="5"
+         result="result1" />
+      <feComposite
+         k4="0"
+         k3="0"
+         k1="0"
+         id="feComposite5321"
+         in2="result1"
+         operator="arithmetic"
+         k2="2"
+         in="result1" />
+    </filter>
+    <filter
+       id="filter3774"
+       inkscape:label="Fancy blur"
+       inkscape:menu="Blurs"
+       inkscape:menu-tooltip="Smooth colorized contour which allows desaturation and hue rotation"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         id="feGaussianBlur3776"
+         stdDeviation="5"
+         result="result1" />
+      <feComposite
+         id="feComposite3778"
+         in2="result1"
+         operator="arithmetic"
+         k2="2"
+         in="result1"
+         k1="0"
+         k3="0"
+         k4="0" />
+    </filter>
+    <filter
+       id="filter3785"
+       inkscape:label="Fancy blur"
+       inkscape:menu="Blurs"
+       inkscape:menu-tooltip="Smooth colorized contour which allows desaturation and hue rotation"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         id="feGaussianBlur3787"
+         stdDeviation="5"
+         result="result1" />
+      <feComposite
+         id="feComposite3789"
+         in2="result1"
+         operator="arithmetic"
+         k2="2"
+         in="result1"
+         k1="0"
+         k3="0"
+         k4="0" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3863"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.7952139"
+         id="feGaussianBlur3865" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3867"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.81566012"
+         id="feGaussianBlur3869" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3871"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.99178093"
+         id="feGaussianBlur3873" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.8233189"
+     inkscape:cx="190.55886"
+     inkscape:cy="303.22932"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="5"
+     fit-margin-left="5"
+     fit-margin-right="5"
+     fit-margin-bottom="5"
+     inkscape:window-width="1440"
+     inkscape:window-height="823"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5435">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-259.04619,-162.97317)">
+    <g
+       id="g3875"
+       transform="translate(0,-35.2319)">
+      <path
+         id="path3948"
+         d="m 312.24756,391.33552 c 0,0 -28.40829,-61.12036 -28.40829,-61.12036 0,0 45.02868,-70.96466 45.02868,-70.96466 0,0 82.22942,-18.90503 82.22942,-18.90503 0,0 39.83741,62.20972 39.83741,62.20972 0,0 -54.645,80.57148 -54.645,80.57148 0,0 -84.04222,8.20885 -84.04222,8.20885"
+         style="font-size:48px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#86ba0c;fill-opacity:1;stroke:none;filter:url(#filter3863);font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold"
+         inkscape:connector-curvature="0" />
+      <path
+         id="path3946"
+         d="m 441.39289,459.59506 c 0,0 -40.99936,-74.92359 -40.99936,-74.92359 0,0 55.00247,-80.91455 55.00247,-80.91455 0,0 108.94918,-17.84487 108.94918,-17.84487 0,0 59.07771,77.38505 59.07771,77.38505 0,0 -69.41919,93.58443 -69.41919,93.58443 0,0 -112.61081,2.71353 -112.61081,2.71353"
+         style="font-size:48px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#bd1788;fill-opacity:1;stroke:none;filter:url(#filter3871);font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold"
+         inkscape:connector-curvature="0" />
+      <path
+         id="path3250"
+         d="m 294.46427,538.05711 c 0,0 -28.4605,-71.76531 -28.4605,-71.76531 0,0 46.36591,-70.72872 46.36591,-70.72872 0,0 84.21943,-7.85812 84.21943,-7.85812 0,0 40.62808,74.91909 40.62808,74.91909 0,0 -56.67617,80.13154 -56.67617,80.13154 0,0 -86.07675,-4.69848 -86.07675,-4.69848"
+         style="font-size:48px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ef7c00;fill-opacity:1;stroke:none;filter:url(#filter3867);font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold"
+         inkscape:connector-curvature="0" />
+      <path
+         id="path3950"
+         d="m 395.00757,387.15342 c 0,0 58.16511,-83.97411 58.16511,-83.97411 0,0 113.919,-17.66874 113.919,-17.66874 0,0 61.00727,82.15249 61.00727,82.15249"
+         style="font-size:48px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;opacity:0.8;fill:none;stroke:#28e3e5;stroke-width:7;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter3785);font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold"
+         inkscape:connector-curvature="0" />
+    </g>
+  </g>
+</svg>
