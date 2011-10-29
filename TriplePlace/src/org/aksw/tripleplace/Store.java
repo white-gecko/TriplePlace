@@ -8,4 +8,5 @@ public interface Store {
 	public List<Triple> query(Triple triple) throws IOException;
 	public void removeTriple(Triple triple) throws IOException;
 	public List<Triple> export() throws IOException;
+	public Node getNode(String nodeString) throws Exception;
 }

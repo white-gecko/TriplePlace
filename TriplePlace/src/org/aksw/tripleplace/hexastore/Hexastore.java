@@ -66,4 +66,9 @@ public class Hexastore implements Store {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public Node getNode(String nodeString) throws Exception {
+		Node node = new Node(nodeString);
+		return node;
+	}
 }

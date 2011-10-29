@@ -23,17 +23,18 @@ public class TriplePlace implements Store {
 	}
 
 	public List<Triple> query(Triple triple) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return store.query(triple);
 	}
 
 	public void removeTriple(Triple triple) throws IOException {
-		// TODO Auto-generated method stub
-		
+		store.removeTriple(triple);
 	}
 
 	public List<Triple> export() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return store.export();
+	}
+
+	public Node getNode(String nodeString) throws Exception {
+		return store.getNode(nodeString);
 	}
 }
