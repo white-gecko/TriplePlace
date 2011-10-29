@@ -1,5 +1,8 @@
 package org.aksw.tripleplace.ui;
 
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.aksw.tripleplace.Node;
 import org.aksw.tripleplace.R;
 import org.aksw.tripleplace.Triple;
@@ -81,34 +84,48 @@ public class TriplePlaceActivity extends Activity {
 
 			Node s, p, o;
 			Triple triple;
+			ArrayList<Triple> tripleList = new ArrayList<Triple>();
 
-			long start, end;
+			long start, end, nodes, triples;
 			start = System.currentTimeMillis();
 			try {
 				for (int i = 0; i < 1000; i++) {
-					s = new Node("<http://" + i + ".eu>");
+					s = hx.getNode("<http://" + i + ".eu>");
 					for (int j = 0; j < 2; j++) {
-						p = new Node("<http://xmlns.com/foaf/0.1/" + i + ","
+						p = hx.getNode("<http://xmlns.com/foaf/0.1/" + i + ","
 								+ j + ">");
 						for (int k = 0; k < 2; k++) {
-							o = new Node("\"Name" + i + "," + j + "," + k
+							o = hx.getNode("\"Name" + i + "," + j + "," + k
 									+ "\"");
-							triple = new Triple(s, p, o);
-							hx.addTriple(triple);
+							tripleList.add(new Triple(s, p, o));
 						}
 					}
 				}
 			} catch (Exception e) {
 				Log.e(TAG, "Couldn't create new Node", e);
 			}
+
+			nodes = (System.currentTimeMillis() - start);
+			Log.v("Benchmark", "Status(" + nodes + ") nodes done");
+
+			try {
+				// TODO Auto-generated catch block
+				for (Triple triple2 : tripleList) {
+					hx.addTriple(triple2);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
 			end = (System.currentTimeMillis() - start);
+			triples = (end - nodes);
+			Log.v("Benchmark", "Status(" + triples + ") triples done");
 			Log.v("Benchmark", "Status(" + end + ") done");
 
 			handler.sendMessage(handler.obtainMessage(1, "Status " + 1000 * 2
 					* 2 + " Tripel in " + end + " ms hinzugefügt, das sind "
 					+ (end / 1000) + " s und " + (end / 1000) / 60
-					+ " min done"));
-			// this.end = end;
+					+ " min done. Nodes: " + nodes + " ms (" + (nodes/1000) + " s), Triples: " + triples + " ms (" + (triples/1000) + " s)."));
 		}
 	}
 
