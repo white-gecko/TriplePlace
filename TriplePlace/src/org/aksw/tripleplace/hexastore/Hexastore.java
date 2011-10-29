@@ -69,6 +69,14 @@ public class Hexastore implements Store {
 
 	public Node getNode(String nodeString) throws Exception {
 		Node node = new Node(nodeString);
+
+		try {
+			dict.addNode(node);
+		} catch (Exception e) {
+			// have to remove the other nodes
+			throw new IOException("Could not add node \"" + node.getNodeString() + "\" to Dictionary", e);
+		}
+		
 		return node;
 	}
 }
