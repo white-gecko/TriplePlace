@@ -113,6 +113,7 @@ public class TriplePlaceActivity extends Activity {
 				s = hx.getNode("<http://0.eu>");
 				p = hx.getNode("<http://xmlns.com/foaf/0.1/0,0>");
 				o = new Node(0);
+				Log.v(TAG, "Ask for s=" + s.getId() + " p=" + p.getId() + " o=" + o.getId());
 				triple = new Triple(s, p, o);
 				result = hx.query(triple);
 			} catch (IOException e) {
@@ -121,13 +122,21 @@ public class TriplePlaceActivity extends Activity {
 				Log.e(TAG, "Exception on querying Triples", e);
 			}
 			end = (System.currentTimeMillis() - start);
-
+			
 			if (result != null) {
-			handler.sendMessage(handler.obtainMessage(1, "Query: In " + end
-					+ " ms, das sind " + (end / 1000) + " s und "
-					+ (end / 1000) / 60 + " min done. Got " + result.size() + ""));
+
+				for (Triple triple2 : result) {
+					Node[] nodes = triple2.getNodes();
+					Log.v(TAG, "Got Triple s=" + nodes[0].getId() + " p=" + nodes[1].getId() + " o=" + nodes[2].getId());
+				}
+				
+				handler.sendMessage(handler.obtainMessage(1, "Query: In " + end
+						+ " ms, das sind " + (end / 1000) + " s und "
+						+ (end / 1000) / 60 + " min done. Got " + result.size()
+						+ ""));
 			} else {
-				handler.sendMessage(handler.obtainMessage(1, "Got null on querying"));
+				handler.sendMessage(handler.obtainMessage(1,
+						"Got null on querying"));
 			}
 		}
 
@@ -183,7 +192,7 @@ public class TriplePlaceActivity extends Activity {
 			triples = (end - nodes);
 			Log.v("Benchmark", "Status(" + triples + ") triples done");
 			Log.v("Benchmark", "Status(" + end + ") done");
-			
+
 			handler.sendMessage(handler.obtainMessage(1, "Status " + 1000 * 2
 					* 2 + " Tripel in " + end + " ms hinzugefügt, das sind "
 					+ (end / 1000) + " s und " + (end / 1000) / 60
