@@ -46,41 +46,41 @@ public class Index {
 	 * 
 	 * @param nodes
 	 */
-	public void addTriple(long[] nodes) {
+	public void addTriple(long[] nodes) throws IOException {
 		// set comparator to 64bit int
 		index.setcmpfunc(BDB.CMPINT64);
-		// set database to use 64bit int bucket-arrays which allows the DB to
+		// set database to use 64bit int bucket-arrays which allows the DB
+		// to
 		// get larger than 2GB
 		index.tune(-1, -1, -1, -1, -1, BDB.TLARGE);
-		if (!index.open(path, BDB.OWRITER | BDB.OCREAT)) {
-			Log.e(TAG, "Couldn't open Index tree. Error(" + index.ecode()
-					+ "): \"" + index.errmsg() + "\"");
-		}
 		try {
-			ByteBuffer buffer = ByteBuffer.allocate(16);
+			if (index.open(path, BDB.OWRITER | BDB.OCREAT)) {
+				ByteBuffer buffer = ByteBuffer.allocate(16);
 
-			buffer.putLong(nodes[order[0]]);
-			buffer.putLong(nodes[order[1]]);
-			byte[] key = buffer.array();
-			
-			ByteBuffer buffer2 = ByteBuffer.allocate(8);
-			
-			// write terminalelement
-			buffer2.putLong(nodes[order[2]]);
-			byte[] value = buffer2.array();
+				buffer.putLong(nodes[order[0]]);
+				buffer.putLong(nodes[order[1]]);
+				byte[] key = buffer.array();
 
-			// maybe check first if this value already exists to get no
-			// duplicates in the list
-			// but maybe this is solved if we put the result of getlist in a
-			// kind of set or so
-			if (!index.putdup(key, value)) {
-				throw new IOException("Could not insert new triple to index. Error("
-						+ index.ecode() + "): \""
-						+ index.errmsg() + "\"");
+				ByteBuffer buffer2 = ByteBuffer.allocate(8);
+
+				// write terminalelement
+				buffer2.putLong(nodes[order[2]]);
+				byte[] value = buffer2.array();
+
+				if (!index.putdup(key, value)) {
+					throw new IOException(
+							"Could not insert new triple to index. Error("
+									+ index.ecode() + "): \"" + index.errmsg()
+									+ "\"");
+				}
+
+			} else {
+				throw new IOException("Couldn't open Index tree. Error("
+						+ index.ecode() + "): \"" + index.errmsg() + "\"");
 			}
-		} catch (Exception e) {
-			Log.e(TAG, "Error inserting triple (s=" + nodes[0] + ",p="
-					+ nodes[1] + ",o=" + nodes[2] + ") into index ("
+		} catch (IOException e) {
+			throw new IOException("Error inserting triple (s=" + nodes[0]
+					+ ",p=" + nodes[1] + ",o=" + nodes[2] + ") into index ("
 					+ _orderToString(order) + ")", e);
 		} finally {
 			index.close();
@@ -99,9 +99,8 @@ public class Index {
 					try {
 						ByteBuffer buffer = ByteBuffer.allocate(16);
 
-						for (int i = 0; i < 2; i++) {
-							buffer.putLong(pathern[order[i]]);
-						}
+						buffer.putLong(pathern[order[0]]);
+						buffer.putLong(pathern[order[1]]);
 						byte[] key = buffer.array();
 
 						List<byte[]> values = index.getlist(key);
@@ -136,6 +135,48 @@ public class Index {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * WARNING! This method will return false, if the triple contains a variable
+	 * node, because the index can't contain 0 nodes
+	 * 
+	 * @param nodes
+	 * @return
+	 * @throws IOException if the index can't be opened
+	 */
+	public boolean hasTriple(long[] nodes) throws IOException {
+		// set comparator to 64bit int
+		index.setcmpfunc(BDB.CMPINT64);
+		// set database to use 64bit int bucket-arrays which allows the
+		// DB to get larger than 2GB
+		index.tune(-1, -1, -1, -1, -1, BDB.TLARGE);
+		try {
+			if (index.open(path, BDB.OREADER)) {
+				ByteBuffer buffer = ByteBuffer.allocate(16);
+				buffer.putLong(nodes[order[0]]);
+				buffer.putLong(nodes[order[1]]);
+				byte[] key = buffer.array();
+
+				ByteBuffer buffer2 = ByteBuffer.allocate(8);
+				buffer2.putLong(nodes[order[2]]);
+				byte[] value = buffer2.array();
+
+				List<byte[]> existing = index.getlist(key);
+				if (existing != null) {
+					return existing.contains(value);
+				}
+			} else {
+				throw new IOException(
+						"Could not open index for reading. Error("
+								+ index.ecode() + "): \"" + index.errmsg()
+								+ "\"");
+			}
+
+		} finally {
+			index.close();
+		}
+		return false;
 	}
 
 	private static String _orderToString(int[] order) {

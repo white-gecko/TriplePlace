@@ -21,6 +21,8 @@ public class Dictionary {
 	private HDB dictInv = new HDB(); // Is this neccesery or can I open
 										// different HDBs with the same instance
 	private String pathDir, pathInv;
+	
+	private static Random rand = new Random();
 
 	public Dictionary(String pathDirIn, String pathInvIn) {
 		pathDir = pathDirIn;
@@ -67,7 +69,6 @@ public class Dictionary {
 				Log.i(TAG,
 						"Please note, that the dictionary is half-full, the probability for collisions is more likely now!");
 			}
-			Random rand = new Random();
 			long key = rand.nextLong();
 			try {
 				// key 0 is reserved as N/A

@@ -56,8 +56,14 @@ public class Hexastore implements Store {
 			nodeIds[i] = nodes[i].getId();
 		}
 
-		for (Index index : indices) {
-			index.addTriple(nodeIds);
+		// maybe check first if this value already exists to get no
+		// duplicates in the list
+
+		if (!indices[0].hasTriple(nodeIds)) {
+			for (Index index : indices) {
+				// should catch exceptions and try to asure ACID
+				index.addTriple(nodeIds);
+			}
 		}
 	}
 
@@ -77,15 +83,18 @@ public class Hexastore implements Store {
 
 		// get the right index
 		List<long[]> resultSetIndex = indices[0].getTriples(pathern);
-		List<Triple> resultSet = new ArrayList<Triple>();
-		Node s, p, o;
-		for (long[] result : resultSetIndex) {
-			s = new Node(result[0]);
-			p = new Node(result[1]);
-			o = new Node(result[2]);
-			resultSet.add(new Triple(s, p, o));
+		if (resultSetIndex != null) {
+			List<Triple> resultSet = new ArrayList<Triple>();
+			Node s, p, o;
+			for (long[] result : resultSetIndex) {
+				s = new Node(result[0]);
+				p = new Node(result[1]);
+				o = new Node(result[2]);
+				resultSet.add(new Triple(s, p, o));
+			}
+			return resultSet;
 		}
-		return resultSet;
+		return null;
 	}
 
 	public void removeTriple(Triple triple) throws IOException {
