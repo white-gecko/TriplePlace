@@ -59,6 +59,10 @@ public class Node {
 	 */
 	private String lang;
 
+	public Node(long nodeId) {
+		this.id = nodeId;
+	}
+	
 	public Node(String nodeString) throws Exception {
 		// parse nodeString
 		int length = nodeString.length();

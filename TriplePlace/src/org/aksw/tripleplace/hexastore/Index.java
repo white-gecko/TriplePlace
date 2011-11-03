@@ -3,6 +3,8 @@ package org.aksw.tripleplace.hexastore;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 import tokyocabinet.BDB;
@@ -57,29 +59,32 @@ public class Index {
 					+ "): \"" + index.errmsg() + "\"");
 		}
 		try {
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			DataOutputStream dos = new DataOutputStream(bos);
 
-			//Log.v(TAG, "Adding Triple to index");
+			ByteBuffer buffer = ByteBuffer.allocate(16);
 
-			for (int i = 0; i < 2; i++) {
-				dos.writeLong(nodes[order[i]]);
-			}
-			dos.flush();
-			byte[] key = bos.toByteArray();
+			// Log.v(TAG, "Adding Triple to index");
 
+			buffer.putLong(nodes[order[0]]);
+			buffer.putLong(nodes[order[1]]);
+			byte[] key = buffer.array();
+			
+			ByteBuffer buffer2 = ByteBuffer.allocate(8);
+			
 			// write terminalelement
-			dos.writeLong(nodes[order[2]]);
-			dos.flush();
-			byte[] value = bos.toByteArray();
+			buffer2.putLong(nodes[order[2]]);
+			byte[] value = buffer2.array();
 
 			// index.put(key, new byte[] {0});
 			// maybe check first if this value already exists to get no
 			// duplicates in the list
 			// but maybe this is solved if we put the result of getlist in a
 			// kind of set or so
-			index.putdup(key, value);
-		} catch (IOException e) {
+			if (!index.putdup(key, value)) {
+				throw new IOException("Could not insert nut triple to index. Error("
+						+ index.ecode() + "): \""
+						+ index.errmsg() + "\"");
+			}
+		} catch (Exception e) {
 			Log.e(TAG, "Error inserting triple (s=" + nodes[0] + ",p="
 					+ nodes[1] + ",o=" + nodes[2] + ") into index ("
 					+ _orderToString(order) + ")", e);
@@ -89,8 +94,8 @@ public class Index {
 	}
 
 	public List<long[]> getTriples(long[] pathern) throws IOException {
-		if (pathern[order[3]] == 0) {
-			if (pathern[order[1]] != 0 && pathern[order[2]] != 0) {
+		if (pathern[order[2]] == 0) {
+			if (pathern[order[0]] != 0 && pathern[order[1]] != 0) {
 				// set comparator to 64bit int
 				index.setcmpfunc(BDB.CMPINT64);
 				// set database to use 64bit int bucket-arrays which allows the
@@ -98,26 +103,38 @@ public class Index {
 				index.tune(-1, -1, -1, -1, -1, BDB.TLARGE);
 				if (index.open(path, BDB.OREADER)) {
 					try {
-						ByteArrayOutputStream bos = new ByteArrayOutputStream();
-						DataOutputStream dos = new DataOutputStream(bos);
-
-						Log.v(TAG, "Adding Triple to index");
+						ByteBuffer buffer = ByteBuffer.allocate(16);
 
 						for (int i = 0; i < 2; i++) {
-							dos.writeLong(pathern[order[i]]);
+							buffer.putLong(pathern[order[i]]);
 						}
-						dos.flush();
-						byte[] key = bos.toByteArray();
+						byte[] key = buffer.array();
 
-						List values = index.getlist(key);
-						
-						// write byte[]s to longs again
-						// build List
-						// return List
-						
-					} catch (IOException e) {
-						throw new IOException(
-								"Couldn't write pathern nodes to bytearray", e);
+						List<byte[]> values = index.getlist(key);
+
+						if (values != null) {
+							List<long[]> result = new ArrayList<long[]>();
+							for (byte[] binding : values) {
+								ByteBuffer buffer2 = ByteBuffer.allocate(8);
+								buffer2 = ByteBuffer.wrap(binding);
+
+								// copy exisiting pathern
+								long[] nodes = pathern.clone();
+
+								// replace variable with result
+								nodes[order[2]] = buffer2.getLong();
+
+								// add result to answer set
+								result.add(nodes);
+							}
+							return result;
+						} else {
+							throw new IOException(
+									"Got null result on getting list from index. Error("
+											+ index.ecode() + "): \""
+											+ index.errmsg() + "\"");
+						}
+
 					} finally {
 						index.close();
 					}

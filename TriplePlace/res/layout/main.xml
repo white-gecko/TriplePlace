@@ -9,5 +9,6 @@
     android:layout_height="wrap_content" 
     android:text="@string/hello" android:id="@+id/hello"
     />
-    <Button android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="Start" android:id="@+id/start"/>
+    <Button android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="Start Insert" android:id="@+id/startInsert"/>
+    <Button android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="Start Query" android:id="@+id/startQuery"/>
 </LinearLayout>

@@ -2,6 +2,7 @@ package org.aksw.tripleplace.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.aksw.tripleplace.Node;
 import org.aksw.tripleplace.R;
@@ -29,10 +30,12 @@ public class TriplePlaceActivity extends Activity {
 		setContentView(R.layout.main);
 
 		TextView text = (TextView) this.findViewById(R.id.hello);
-		Button go = (Button) this.findViewById(R.id.start);
+		Button insertButton = (Button) this.findViewById(R.id.startInsert);
+		Button queryButton = (Button) this.findViewById(R.id.startQuery);
 		Handler handler = new MyHandler(text);
 
-		go.setOnClickListener(new GoClick(handler));
+		insertButton.setOnClickListener(new InsertClick(handler));
+		queryButton.setOnClickListener(new QueryClick(handler));
 	}
 
 	private class MyHandler extends Handler {
@@ -53,28 +56,45 @@ public class TriplePlaceActivity extends Activity {
 		}
 	}
 
-	private class GoClick implements OnClickListener {
+	private class InsertClick implements OnClickListener {
 
 		private Handler handler;
 
-		public GoClick(Handler handler) {
+		public InsertClick(Handler handler) {
 			this.handler = handler;
 		}
 
 		public void onClick(View v) {
 			String path = getFilesDir().getAbsolutePath();
-			HexaBenchmark b = new HexaBenchmark(path, handler);
+			HexaBenchmarkInsert b = new HexaBenchmarkInsert(path, handler);
 			b.start();
 
-			handler.sendMessage(handler.obtainMessage(1, "läuft ..."));
+			handler.sendMessage(handler.obtainMessage(1, "insert läuft ..."));
 		}
 	}
 
-	private class HexaBenchmark extends Thread {
+	private class QueryClick implements OnClickListener {
 
 		private Handler handler;
 
-		public HexaBenchmark(String path, Handler handler) {
+		public QueryClick(Handler handler) {
+			this.handler = handler;
+		}
+
+		public void onClick(View v) {
+			String path = getFilesDir().getAbsolutePath();
+			HexaBenchmarkQuery b = new HexaBenchmarkQuery(path, handler);
+			b.start();
+
+			handler.sendMessage(handler.obtainMessage(1, "query läuft ..."));
+		}
+	}
+
+	private class HexaBenchmarkQuery extends Thread {
+
+		private Handler handler;
+
+		public HexaBenchmarkQuery(String path, Handler handler) {
 			this.handler = handler;
 		}
 
@@ -84,6 +104,48 @@ public class TriplePlaceActivity extends Activity {
 
 			Node s, p, o;
 			Triple triple;
+
+			long start, end;
+			start = System.currentTimeMillis();
+
+			List<Triple> result = null;
+			try {
+				s = hx.getNode("<http://0.eu>");
+				p = hx.getNode("<http://xmlns.com/foaf/0.1/0,0>");
+				o = new Node(0);
+				triple = new Triple(s, p, o);
+				result = hx.query(triple);
+			} catch (IOException e) {
+				Log.e(TAG, "Exception on querying Triples", e);
+			} catch (Exception e) {
+				Log.e(TAG, "Exception on querying Triples", e);
+			}
+			end = (System.currentTimeMillis() - start);
+
+			if (result != null) {
+			handler.sendMessage(handler.obtainMessage(1, "Query: In " + end
+					+ " ms, das sind " + (end / 1000) + " s und "
+					+ (end / 1000) / 60 + " min done. Got " + result.size() + ""));
+			} else {
+				handler.sendMessage(handler.obtainMessage(1, "Got null on querying"));
+			}
+		}
+
+	}
+
+	private class HexaBenchmarkInsert extends Thread {
+
+		private Handler handler;
+
+		public HexaBenchmarkInsert(String path, Handler handler) {
+			this.handler = handler;
+		}
+
+		public void run() {
+			String path = getFilesDir().getAbsolutePath();
+			Hexastore hx = new Hexastore(path);
+
+			Node s, p, o;
 			ArrayList<Triple> tripleList = new ArrayList<Triple>();
 
 			long start, end, nodes, triples;
@@ -116,16 +178,18 @@ public class TriplePlaceActivity extends Activity {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
+
 			end = (System.currentTimeMillis() - start);
 			triples = (end - nodes);
 			Log.v("Benchmark", "Status(" + triples + ") triples done");
 			Log.v("Benchmark", "Status(" + end + ") done");
-
+			
 			handler.sendMessage(handler.obtainMessage(1, "Status " + 1000 * 2
 					* 2 + " Tripel in " + end + " ms hinzugefügt, das sind "
 					+ (end / 1000) + " s und " + (end / 1000) / 60
-					+ " min done. Nodes: " + nodes + " ms (" + (nodes/1000) + " s), Triples: " + triples + " ms (" + (triples/1000) + " s)."));
+					+ " min done. Nodes: " + nodes + " ms (" + (nodes / 1000)
+					+ " s), Triples: " + triples + " ms (" + (triples / 1000)
+					+ " s)."));
 		}
 	}
 
