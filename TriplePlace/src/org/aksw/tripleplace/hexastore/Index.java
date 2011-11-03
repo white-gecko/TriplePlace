@@ -1,7 +1,5 @@
 package org.aksw.tripleplace.hexastore;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -59,10 +57,7 @@ public class Index {
 					+ "): \"" + index.errmsg() + "\"");
 		}
 		try {
-
 			ByteBuffer buffer = ByteBuffer.allocate(16);
-
-			// Log.v(TAG, "Adding Triple to index");
 
 			buffer.putLong(nodes[order[0]]);
 			buffer.putLong(nodes[order[1]]);
@@ -74,13 +69,12 @@ public class Index {
 			buffer2.putLong(nodes[order[2]]);
 			byte[] value = buffer2.array();
 
-			// index.put(key, new byte[] {0});
 			// maybe check first if this value already exists to get no
 			// duplicates in the list
 			// but maybe this is solved if we put the result of getlist in a
 			// kind of set or so
 			if (!index.putdup(key, value)) {
-				throw new IOException("Could not insert nut triple to index. Error("
+				throw new IOException("Could not insert new triple to index. Error("
 						+ index.ecode() + "): \""
 						+ index.errmsg() + "\"");
 			}
