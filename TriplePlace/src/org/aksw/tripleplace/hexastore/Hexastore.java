@@ -17,6 +17,7 @@ public class Hexastore implements Store {
 	private Dictionary dict;
 
 	public Hexastore(String path) {
+		Log.v(TAG, "Initialized Hexastore at \"" + path + "\"");
 		dict = new Dictionary(path + "/dict.tch", path + "/dictInv.tch");
 		indices = new Index[6];
 		indices[0] = new Index(Index.ORDER_SPO, path + "/spo.tcb");
@@ -35,7 +36,6 @@ public class Hexastore implements Store {
 		for (int i = 0; i < nodes.length; i++) {
 			if (nodes[i].getId() == 0) {
 				// add Node to dictionary
-				// Log.v(TAG, "Adding Node to Dict");
 				try {
 					dict.addNode(nodes[i]);
 				} catch (Exception e) {
