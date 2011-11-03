@@ -56,13 +56,6 @@ public class Hexastore implements Store {
 			nodeIds[i] = nodes[i].getId();
 		}
 
-		Log.v(TAG, "Adding Triple s(" + nodes[0].getId() + ")="
-									+ nodes[0].getNodeString()
-									+ ",p(" + nodes[1].getId() + ")="
-									+ nodes[1].getNodeString()
-									+ ",o(" + nodes[2].getId() + ")="
-									+ nodes[2].getNodeString()
-									+ " to indices.");
 		for (Index index : indices) {
 			index.addTriple(nodeIds);
 		}
@@ -90,7 +83,6 @@ public class Hexastore implements Store {
 			s = new Node(result[0]);
 			p = new Node(result[1]);
 			o = new Node(result[2]);
-			Log.v(TAG, "Add new Triple " + result[0] + "," + result[1] + "," + result[2] + " to query result");
 			resultSet.add(new Triple(s, p, o));
 		}
 		return resultSet;
