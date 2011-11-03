@@ -31,10 +31,12 @@ public class TriplePlaceActivity extends Activity {
 
 		TextView text = (TextView) this.findViewById(R.id.hello);
 		Button insertButton = (Button) this.findViewById(R.id.startInsert);
+		Button insertSmallButton = (Button) this.findViewById(R.id.startInsertSmall);
 		Button queryButton = (Button) this.findViewById(R.id.startQuery);
 		Handler handler = new MyHandler(text);
 
 		insertButton.setOnClickListener(new InsertClick(handler));
+		insertSmallButton.setOnClickListener(new InsertSmallClick(handler));
 		queryButton.setOnClickListener(new QueryClick(handler));
 	}
 
@@ -66,7 +68,24 @@ public class TriplePlaceActivity extends Activity {
 
 		public void onClick(View v) {
 			String path = getFilesDir().getAbsolutePath();
-			HexaBenchmarkInsert b = new HexaBenchmarkInsert(path, handler);
+			HexaBenchmarkInsert b = new HexaBenchmarkInsert(4000, path, handler);
+			b.start();
+
+			handler.sendMessage(handler.obtainMessage(1, "insert läuft ..."));
+		}
+	}
+
+	private class InsertSmallClick implements OnClickListener {
+
+		private Handler handler;
+
+		public InsertSmallClick(Handler handler) {
+			this.handler = handler;
+		}
+
+		public void onClick(View v) {
+			String path = getFilesDir().getAbsolutePath();
+			HexaBenchmarkInsert b = new HexaBenchmarkInsert(40, path, handler);
 			b.start();
 
 			handler.sendMessage(handler.obtainMessage(1, "insert läuft ..."));
@@ -145,8 +164,10 @@ public class TriplePlaceActivity extends Activity {
 	private class HexaBenchmarkInsert extends Thread {
 
 		private Handler handler;
+		private int count;
 
-		public HexaBenchmarkInsert(String path, Handler handler) {
+		public HexaBenchmarkInsert(int count, String path, Handler handler) {
+			this.count = count;
 			this.handler = handler;
 		}
 
@@ -160,7 +181,7 @@ public class TriplePlaceActivity extends Activity {
 			long start, end, nodes, triples;
 			start = System.currentTimeMillis();
 			try {
-				for (int i = 0; i < 1000; i++) {
+				for (int i = 0; i < (count / 4); i++) {
 					s = hx.getNode("<http://" + i + ".eu>");
 					for (int j = 0; j < 2; j++) {
 						p = hx.getNode("<http://xmlns.com/foaf/0.1/" + i + ","
