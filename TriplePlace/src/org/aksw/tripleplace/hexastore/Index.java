@@ -108,8 +108,8 @@ public class Index {
 						if (values != null) {
 							List<long[]> result = new ArrayList<long[]>();
 							for (byte[] binding : values) {
-								ByteBuffer buffer2 = ByteBuffer.allocate(8);
-								buffer2 = ByteBuffer.wrap(binding);
+								//ByteBuffer buffer2 = ByteBuffer.allocate(8);
+								ByteBuffer buffer2 = ByteBuffer.wrap(binding);
 
 								// copy exisiting pathern
 								long[] nodes = pathern.clone();
@@ -143,7 +143,8 @@ public class Index {
 	 * 
 	 * @param nodes
 	 * @return
-	 * @throws IOException if the index can't be opened
+	 * @throws IOException
+	 *             if the index can't be opened
 	 */
 	public boolean hasTriple(long[] nodes) throws IOException {
 		// set comparator to 64bit int
@@ -158,19 +159,26 @@ public class Index {
 				buffer.putLong(nodes[order[1]]);
 				byte[] key = buffer.array();
 
-				ByteBuffer buffer2 = ByteBuffer.allocate(8);
-				buffer2.putLong(nodes[order[2]]);
-				byte[] value = buffer2.array();
-
 				List<byte[]> existing = index.getlist(key);
 				if (existing != null) {
-					return existing.contains(value);
+					for (byte[] bs : existing) {
+						if (Util.unpackLong(bs) == nodes[order[2]]) {
+							return true;
+						}
+					}
+					// not possible because same byte arrays are not compareable as objects
+					//return existing.contains(value);
 				}
 			} else {
+				// check if file not found
+				if (index.ecode() == 3) {
+					return false;
+				} else {
 				throw new IOException(
 						"Could not open index for reading. Error("
 								+ index.ecode() + "): \"" + index.errmsg()
 								+ "\"");
+				}
 			}
 
 		} finally {
