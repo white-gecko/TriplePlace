@@ -28,6 +28,11 @@ public class Hexastore implements Store {
 		indices[5] = new Index(Index.ORDER_OPS, path + "/ops.tcb");
 	}
 
+	/**
+	 * Add a new Triple to the model
+	 * 
+	 * @param triple the Triple which should be added to the model
+	 */
 	public void addTriple(Triple triple) throws IOException {
 
 		Node[] nodes = triple.getNodes();
@@ -67,6 +72,14 @@ public class Hexastore implements Store {
 		}
 	}
 
+	/**
+	 * The query method takes a Triple object which has one ore more variable
+	 * Nodes and returns a List of all Triples which match the given Triple
+	 * 
+	 * @param triple
+	 *            a which has one ore more variable Nodes
+	 * @return a List of Triples which match the given Triple
+	 */
 	public List<Triple> query(Triple triple) throws IOException {
 		// find out which parts are unbound
 		Node[] nodes = triple.getNodes();
@@ -107,6 +120,14 @@ public class Hexastore implements Store {
 		return null;
 	}
 
+	/**
+	 * Retrieves the spezified Node fromt the model or creates a new one, if
+	 * this Nodes doesn't exist in the Model.
+	 * 
+	 * @param nodeString
+	 *            spezifies the Node as used in N3, N-Triples and Turtle
+	 * @return a Node object representing the given Node with a Dictionary ID
+	 */
 	public Node getNode(String nodeString) throws Exception {
 		Node node = new Node(nodeString);
 
