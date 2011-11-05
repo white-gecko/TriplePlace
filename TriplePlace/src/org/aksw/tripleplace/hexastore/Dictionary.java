@@ -37,8 +37,8 @@ public class Dictionary {
 		// else proceed
 
 		if (node.getType() == Node.TYPE_VARIABLE) {
-			throw new Exception(
-					"The given node is a variable and can't be added to the dictionary");
+			return 0;
+			// throw new Exception("The given node is a variable and can't be added to the dictionary");
 		}
 
 		if (dict.open(pathDir, HDB.OREADER)) {
@@ -46,6 +46,7 @@ public class Dictionary {
 			try {
 				String idString = dict.get(node.getNodeString());
 				if (idString != null) {
+					// TODO: don't use Strings
 					long id = Long.parseLong(idString);
 					node.setId(id);
 					return id;
@@ -72,6 +73,7 @@ public class Dictionary {
 			long key = rand.nextLong();
 			try {
 				// key 0 is reserved as N/A
+				// TODO: don't use Strings
 				while (key == 0
 						|| !dictInv.putkeep(String.valueOf(key),
 								node.getNodeString())) {
@@ -89,6 +91,7 @@ public class Dictionary {
 				}
 				// Overwrite existing nodes, because it shouldn't happen
 				// if it happens the node was orphaned
+				// TODO: don't use Strings
 				if (dict.put(node.getNodeString(), String.valueOf(key))) {
 					//Log.i(TAG,
 					//		"Successfully added new Node ("
@@ -106,6 +109,7 @@ public class Dictionary {
 				} else {
 					// remove entry from inverse dictionary because an error
 					// occured
+					// TODO: don't use Strings
 					dictInv.out(String.valueOf(key));
 					throw new IOException("Problem adding new Node ("
 							+ node.getNodeString() + ") to Dictionary. Error("
@@ -130,18 +134,27 @@ public class Dictionary {
 
 	}
 
-	public Node getNode(int id) {
+	public Node getNode(long id) throws Exception {
+		if (id == 0) {
+			// Exception or return null
+			throw new Exception("Nodes with the ID = 0 are not allowed");
+		}
 		if (dictInv.open(pathInv, HDB.OREADER)) {
+			// TODO: don't use Strings
 			String nodeString = dictInv.get(String.valueOf(id));
 			dictInv.close();
 			try {
-				return new Node(nodeString);
+				Node node = new Node(nodeString);
+				node.setId(id);
+				return node;
 			} catch (Exception e) {
+				// TODO: throw Exception
 				Log.e(TAG, "Dictionary returned invalide nodeString: \""
 						+ nodeString + "\"", e);
 				return null;
 			}
 		} else {
+			// TODO: throw Exception
 			Log.e(TAG,
 					"Couldn't open Dictionary hash-table. Error("
 							+ dictInv.ecode() + "): \"" + dictInv.errmsg()
