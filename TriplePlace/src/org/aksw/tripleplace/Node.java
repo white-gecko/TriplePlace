@@ -58,10 +58,6 @@ public class Node {
 	 * Is only set for TYPE_LANG_LITERAL
 	 */
 	private String lang;
-
-	public Node(long nodeId) {
-		this.id = nodeId;
-	}
 	
 	public Node(String nodeString) throws Exception {
 		// parse nodeString
