@@ -122,7 +122,9 @@ public class Hexastore implements Store {
 			// s and p fix: spo and pso
 			// s and o fix: sop and osp
 			// p and o fix: pos and ops
-
+		case 3:
+			// index: spo, sop, pso, pos, osp and ops
+			
 			// get the right index
 			int[] selectedIndeces = null;
 			int selectedIndex = -1;
@@ -166,9 +168,6 @@ public class Hexastore implements Store {
 								+ ")");
 			}
 			break;
-		case 3:
-			// index: spo, sop, pso, pos, osp and ops
-			resultSet.add(triple);
 		}
 		return resultSet;
 	}
