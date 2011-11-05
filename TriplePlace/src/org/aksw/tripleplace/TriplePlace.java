@@ -30,7 +30,7 @@ public class TriplePlace implements Store {
 		store.removeTriple(triple);
 	}
 
-	public List<Triple> export() throws IOException {
+	public List<Triple> export() throws Exception {
 		return store.export();
 	}
 
