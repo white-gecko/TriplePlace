@@ -75,7 +75,7 @@ public class Hexastore implements Store {
 			}
 		}
 	}
-	
+
 	/**
 	 * The query method takes a Triple object which has one ore more variable
 	 * Nodes and returns a List of all Triples which match the given Triple
@@ -95,20 +95,20 @@ public class Hexastore implements Store {
 		 * Stores the order of the gives triple pathern. 0 - no fix Node, 1 -
 		 * one fix Node, 2 - two fix Nodes, 3 - all fix Nodes
 		 */
-		int order = 0;
+		int fixedNum = 0;
 
 		for (int i = 0; i < 3; i++) {
 			if (nodes[i].getId() == 0) {
 				// unbound
 				pathern[i] = 0;
 			} else {
-				order++;
+				fixedNum++;
 				pathern[i] = nodes[i].getId();
 			}
 		}
 
 		List<Triple> resultSet = new ArrayList<Triple>();
-		switch (order) {
+		switch (fixedNum) {
 		case 0:
 			// index: spo, sop, pso, pos, osp and ops
 			return export();
@@ -150,27 +150,27 @@ public class Hexastore implements Store {
 						o = dict.getNode(result[2]);
 						resultSet.add(new Triple(s, p, o));
 					}
-					return resultSet;
+					// return resultSet;
 				}
+				// else empty
 			} else {
 				throw new Exception(
 						"This is a bug in the code, please report this Exception to arndtn@gmail.com: order: "
-								+ order
+								+ fixedNum
 								+ " pathern: s("
 								+ pathern[0]
 								+ "), p("
-								+ pathern[1] + "), o(" + pathern[2] + ")");
+								+ pathern[1]
+								+ "), o("
+								+ pathern[2]
+								+ ")");
 			}
 			break;
 		case 3:
 			// index: spo, sop, pso, pos, osp and ops
 			resultSet.add(triple);
-			return resultSet;
-		default:
-			break;
 		}
-
-		return null;
+		return resultSet;
 	}
 
 	public void removeTriple(Triple triple) throws IOException {
@@ -203,7 +203,7 @@ public class Hexastore implements Store {
 
 		return node;
 	}
-	
+
 	public Node getNode(long id) throws Exception {
 		return dict.getNode(id);
 	}

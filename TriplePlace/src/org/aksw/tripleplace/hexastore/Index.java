@@ -55,19 +55,11 @@ public class Index {
 		index.tune(-1, -1, -1, -1, -1, BDB.TLARGE);
 		try {
 			if (index.open(path, BDB.OWRITER | BDB.OCREAT)) {
-				ByteBuffer buffer = ByteBuffer.allocate(16);
+				byte[] key = Util.packLong(nodes, order);
 
-				buffer.putLong(nodes[order[0]]);
-				buffer.putLong(nodes[order[1]]);
-				byte[] key = buffer.array();
+				byte[] value = {0};
 
-				ByteBuffer buffer2 = ByteBuffer.allocate(8);
-
-				// write terminalelement
-				buffer2.putLong(nodes[order[2]]);
-				byte[] value = buffer2.array();
-
-				if (!index.putdup(key, value)) {
+				if (!index.put(key, value)) {
 					throw new IOException(
 							"Could not insert new triple to index. Error("
 									+ index.ecode() + "): \"" + index.errmsg()
@@ -88,96 +80,46 @@ public class Index {
 	}
 
 	public List<long[]> getTriples(long[] pathern) throws IOException {
-		if (pathern[order[2]] == 0 && pathern[order[0]] != 0) {
-			// set comparator to 64bit int
-			//index.setcmpfunc(BDB.CMPINT64);
-			// set database to use 64bit int bucket-arrays which allows the
-			// DB to get larger than 2GB
-			index.tune(-1, -1, -1, -1, -1, BDB.TLARGE);
-			if (index.open(path, BDB.OREADER)) {
 
-				try {
-					if (pathern[order[1]] != 0) {
-						ByteBuffer buffer = ByteBuffer.allocate(16);
-
-						buffer.putLong(pathern[order[0]]);
-						buffer.putLong(pathern[order[1]]);
-						byte[] key = buffer.array();
-
-						List<byte[]> values = index.getlist(key);
-
-						if (values != null) {
-							List<long[]> result = new ArrayList<long[]>();
-							for (byte[] binding : values) {
-								// ByteBuffer buffer2 = ByteBuffer.allocate(8);
-								ByteBuffer buffer2 = ByteBuffer.wrap(binding);
-
-								// copy exisiting pathern
-								long[] nodes = pathern.clone();
-
-								// replace variable with result
-								nodes[order[2]] = buffer2.getLong();
-
-								// add result to answer set
-								result.add(nodes);
-							}
-							return result;
-						} else {
-							throw new IOException(
-									"Got null result on getting list from index. Error("
-											+ index.ecode() + "): \""
-											+ index.errmsg() + "\"");
-						}
-					} else {
-						// pathern[order[1]] == 0
-
-						byte[] keyPrefix = Util.packLong(pathern[order[0]]);
-
-						// -1 means no limit
-						List<byte[]> keys = index.fwmkeys(keyPrefix, -1);
-
-						List<long[]> result = new ArrayList<long[]>();
-						List<byte[]> values;
-						for (byte[] key : keys) {
-							values = index.getlist(key);
-
-							if (values != null) {
-								for (byte[] binding : values) {
-									ByteBuffer buffer2 = ByteBuffer
-											.allocate(24);
-
-									buffer2.put(key);
-									buffer2.put(binding);
-									buffer2.rewind();
-
-									// copy exisiting pathern
-									long[] nodes = pathern.clone();
-
-									// replace variables with results
-									buffer2.getLong(); // discard (should be
-														// same as order[0])
-									nodes[order[1]] = buffer2.getLong(); // key
-									nodes[order[2]] = buffer2.getLong();
-
-									// add result to answer set
-									result.add(nodes);
-								}
-							} else {
-								throw new IOException(
-										"Got null result on getting list from index. Error("
-												+ index.ecode() + "): \""
-												+ index.errmsg() + "\"");
-							}
-
-						}
-						return result;
-					}
-				} finally {
-					index.close();
-				}
+		int fixedNum = 0;
+		for (int i : order) {
+			if (pathern[i] != 0) {
+				fixedNum++;
 			}
 		}
-		return null;
+		
+		ByteBuffer buffer = ByteBuffer.allocate(fixedNum * 8);
+		for (int i : order) {
+			if (pathern[i] != 0) {
+				buffer.putLong(pathern[i]);
+			}
+		}
+		byte[] keyPrefix = buffer.array();
+
+		// set database to use 64bit int bucket-arrays which allows the
+		// DB to get larger than 2GB
+		index.tune(-1, -1, -1, -1, -1, BDB.TLARGE);
+		if (index.open(path, BDB.OREADER)) {
+			try {
+				// -1 means no limit
+				List<byte[]> keys = index.fwmkeys(keyPrefix, -1);
+
+				List<long[]> result = new ArrayList<long[]>();
+				for (byte[] key : keys) {
+					long[] nodes = Util.unpackLongs(key, order);
+
+					// add result to answer set
+					result.add(nodes);
+				}
+				return result;
+
+			} finally {
+				index.close();
+			}
+		} else {
+			throw new IOException("Couldn't open Index tree. Error("
+					+ index.ecode() + "): \"" + index.errmsg() + "\"");
+		}
 	}
 
 	/**
@@ -195,40 +137,29 @@ public class Index {
 		// set database to use 64bit int bucket-arrays which allows the
 		// DB to get larger than 2GB
 		index.tune(-1, -1, -1, -1, -1, BDB.TLARGE);
-		try {
-			if (index.open(path, BDB.OREADER)) {
-				ByteBuffer buffer = ByteBuffer.allocate(16);
-				buffer.putLong(nodes[order[0]]);
-				buffer.putLong(nodes[order[1]]);
-				byte[] key = buffer.array();
+		if (index.open(path, BDB.OREADER)) {
+			try {
+				byte[] key = Util.packLong(nodes, order);
 
-				List<byte[]> existing = index.getlist(key);
-				if (existing != null) {
-					for (byte[] bs : existing) {
-						if (Util.unpackLong(bs) == nodes[order[2]]) {
-							return true;
-						}
-					}
-					// not possible because same byte arrays are not compareable
-					// as objects
-					// return existing.contains(value);
-				}
-			} else {
-				// check if file not found
-				if (index.ecode() == 3) {
-					return false;
+				if (index.get(key) != null) {
+					return true;
 				} else {
-					throw new IOException(
-							"Could not open index for reading. Error("
-									+ index.ecode() + "): \"" + index.errmsg()
-									+ "\"");
+					return false;
 				}
+			} finally {
+				index.close();
 			}
-
-		} finally {
-			index.close();
+		} else {
+			// check if file not found
+			if (index.ecode() == 3) {
+				return false;
+			} else {
+				throw new IOException(
+						"Could not open index for reading. Error("
+								+ index.ecode() + "): \"" + index.errmsg()
+								+ "\"");
+			}
 		}
-		return false;
 	}
 
 	private static String _orderToString(int[] order) {
