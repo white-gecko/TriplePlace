@@ -33,7 +33,7 @@ public class Index {
 	private String path;
 
 	public Index(int[] orderIn, String pathIn) {
-		order = orderIn.clone();
+		order = orderIn;
 		path = pathIn;
 		TAG += "(" + _orderToString(order) + ")";
 		index = new BDB();
@@ -48,7 +48,7 @@ public class Index {
 	 */
 	public void addTriple(long[] nodes) throws IOException {
 		// set comparator to 64bit int
-		index.setcmpfunc(BDB.CMPINT64);
+		// index.setcmpfunc(BDB.CMPINT64);
 		// set database to use 64bit int bucket-arrays which allows the DB
 		// to
 		// get larger than 2GB
@@ -88,15 +88,16 @@ public class Index {
 	}
 
 	public List<long[]> getTriples(long[] pathern) throws IOException {
-		if (pathern[order[2]] == 0) {
-			if (pathern[order[0]] != 0 && pathern[order[1]] != 0) {
-				// set comparator to 64bit int
-				index.setcmpfunc(BDB.CMPINT64);
-				// set database to use 64bit int bucket-arrays which allows the
-				// DB to get larger than 2GB
-				index.tune(-1, -1, -1, -1, -1, BDB.TLARGE);
-				if (index.open(path, BDB.OREADER)) {
-					try {
+		if (pathern[order[2]] == 0 && pathern[order[0]] != 0) {
+			// set comparator to 64bit int
+			//index.setcmpfunc(BDB.CMPINT64);
+			// set database to use 64bit int bucket-arrays which allows the
+			// DB to get larger than 2GB
+			index.tune(-1, -1, -1, -1, -1, BDB.TLARGE);
+			if (index.open(path, BDB.OREADER)) {
+
+				try {
+					if (pathern[order[1]] != 0) {
 						ByteBuffer buffer = ByteBuffer.allocate(16);
 
 						buffer.putLong(pathern[order[0]]);
@@ -108,7 +109,7 @@ public class Index {
 						if (values != null) {
 							List<long[]> result = new ArrayList<long[]>();
 							for (byte[] binding : values) {
-								//ByteBuffer buffer2 = ByteBuffer.allocate(8);
+								// ByteBuffer buffer2 = ByteBuffer.allocate(8);
 								ByteBuffer buffer2 = ByteBuffer.wrap(binding);
 
 								// copy exisiting pathern
@@ -127,10 +128,52 @@ public class Index {
 											+ index.ecode() + "): \""
 											+ index.errmsg() + "\"");
 						}
+					} else {
+						// pathern[order[1]] == 0
 
-					} finally {
-						index.close();
+						byte[] keyPrefix = Util.packLong(pathern[order[0]]);
+
+						// -1 means no limit
+						List<byte[]> keys = index.fwmkeys(keyPrefix, -1);
+
+						List<long[]> result = new ArrayList<long[]>();
+						List<byte[]> values;
+						for (byte[] key : keys) {
+							values = index.getlist(key);
+
+							if (values != null) {
+								for (byte[] binding : values) {
+									ByteBuffer buffer2 = ByteBuffer
+											.allocate(24);
+
+									buffer2.put(key);
+									buffer2.put(binding);
+									buffer2.rewind();
+
+									// copy exisiting pathern
+									long[] nodes = pathern.clone();
+
+									// replace variables with results
+									buffer2.getLong(); // discard (should be
+														// same as order[0])
+									nodes[order[1]] = buffer2.getLong(); // key
+									nodes[order[2]] = buffer2.getLong();
+
+									// add result to answer set
+									result.add(nodes);
+								}
+							} else {
+								throw new IOException(
+										"Got null result on getting list from index. Error("
+												+ index.ecode() + "): \""
+												+ index.errmsg() + "\"");
+							}
+
+						}
+						return result;
 					}
+				} finally {
+					index.close();
 				}
 			}
 		}
@@ -148,7 +191,7 @@ public class Index {
 	 */
 	public boolean hasTriple(long[] nodes) throws IOException {
 		// set comparator to 64bit int
-		index.setcmpfunc(BDB.CMPINT64);
+		// index.setcmpfunc(BDB.CMPINT64);
 		// set database to use 64bit int bucket-arrays which allows the
 		// DB to get larger than 2GB
 		index.tune(-1, -1, -1, -1, -1, BDB.TLARGE);
@@ -166,18 +209,19 @@ public class Index {
 							return true;
 						}
 					}
-					// not possible because same byte arrays are not compareable as objects
-					//return existing.contains(value);
+					// not possible because same byte arrays are not compareable
+					// as objects
+					// return existing.contains(value);
 				}
 			} else {
 				// check if file not found
 				if (index.ecode() == 3) {
 					return false;
 				} else {
-				throw new IOException(
-						"Could not open index for reading. Error("
-								+ index.ecode() + "): \"" + index.errmsg()
-								+ "\"");
+					throw new IOException(
+							"Could not open index for reading. Error("
+									+ index.ecode() + "): \"" + index.errmsg()
+									+ "\"");
 				}
 			}
 
