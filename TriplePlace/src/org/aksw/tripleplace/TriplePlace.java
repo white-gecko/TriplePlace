@@ -22,7 +22,7 @@ public class TriplePlace implements Store {
 		store.addTriple(triple);
 	}
 
-	public List<Triple> query(Triple triple) throws IOException {
+	public List<Triple> query(Triple triple) throws Exception {
 		return store.query(triple);
 	}
 
