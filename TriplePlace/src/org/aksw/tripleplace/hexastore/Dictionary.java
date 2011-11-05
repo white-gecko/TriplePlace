@@ -1,15 +1,12 @@
 package org.aksw.tripleplace.hexastore;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
 import org.aksw.tripleplace.Node;
 
-import android.util.Log;
-
-import tokyocabinet.BDB;
 import tokyocabinet.HDB;
+import android.util.Log;
 
 /**
  * Mapping of resources and literals to an ID used in the indices

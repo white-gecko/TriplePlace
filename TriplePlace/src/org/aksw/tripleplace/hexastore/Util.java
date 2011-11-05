@@ -26,7 +26,6 @@ public class Util {
 		buffer.putLong(number);
 		return buffer.array();
 	}
-
 	
 	public static long unpackLong(byte[] bytes) {
 		return unpackLong(bytes, false);
