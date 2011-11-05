@@ -8,6 +8,7 @@ import org.aksw.tripleplace.Node;
 
 import android.util.Log;
 
+import tokyocabinet.BDB;
 import tokyocabinet.HDB;
 
 /**
@@ -43,6 +44,10 @@ public class Dictionary {
 			// Exception("The given node is a variable and can't be added to the dictionary");
 		}
 
+		// set database to use 64bit int bucket-arrays which allows the DB
+		// to get larger than 2GB
+		dict.tune(-1, -1, -1, HDB.TLARGE);
+		
 		if (dict.open(pathDir, HDB.OREADER)) {
 			// find resource in hashTable
 			try {
@@ -65,6 +70,11 @@ public class Dictionary {
 								+ dict.ecode() + "): \"" + dict.errmsg() + "\"");
 			}
 		}
+
+		// set database to use 64bit int bucket-arrays which allows the DB
+		// to get larger than 2GB
+		dict.tune(-1, -1, -1, HDB.TLARGE);
+		dictInv.tune(-1, -1, -1, HDB.TLARGE);
 
 		// add node to dicts
 		if (dict.open(pathDir, HDB.OWRITER | HDB.OCREAT)
@@ -141,6 +151,11 @@ public class Dictionary {
 			// Exception or return null
 			throw new Exception("Nodes with the ID = 0 are not allowed");
 		}
+
+		// set database to use 64bit int bucket-arrays which allows the DB
+		// to get larger than 2GB
+		dictInv.tune(-1, -1, -1, HDB.TLARGE);
+
 		if (dictInv.open(pathInv, HDB.OREADER)) {
 			try {
 				byte[] nodeStringBytes = dictInv.get(Util.packLong(id));
