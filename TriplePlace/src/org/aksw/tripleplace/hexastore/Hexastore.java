@@ -91,83 +91,34 @@ public class Hexastore implements Store {
 		Node[] nodes = triple.getNodes();
 		long[] pathern = new long[nodes.length];
 
-		/**
-		 * Stores the order of the gives triple pathern. 0 - no fix Node, 1 -
-		 * one fix Node, 2 - two fix Nodes, 3 - all fix Nodes
-		 */
-		int fixedNum = 0;
+		// get the right index
+		int[] selectedIndeces = null;
+		int selectedIndex = 0;
 
 		for (int i = 0; i < 3; i++) {
-			if (nodes[i].getId() == 0) {
-				// unbound
-				pathern[i] = 0;
-			} else {
-				fixedNum++;
-				pathern[i] = nodes[i].getId();
+			// check for fixed nodes
+			if (pathern[i] != 0) {
+				// this should be true the first time
+				if (selectedIndeces == null) {
+					selectedIndeces = indexSelection[i];
+				}
+				selectedIndex = selectedIndeces[i];
 			}
 		}
 
+		List<long[]> resultSetIndex = indices[selectedIndex]
+				.getTriples(pathern);
+
 		List<Triple> resultSet = new ArrayList<Triple>();
-		switch (fixedNum) {
-		case 0:
-			// index: spo, sop, pso, pos, osp and ops
-			return export();
-		case 1:
-			// index:
-			// s fix: spo and sop
-			// p fix: pso and pos
-			// o fix: osp and ops
-		case 2:
-			// index:
-			// s and p fix: spo and pso
-			// s and o fix: sop and osp
-			// p and o fix: pos and ops
-		case 3:
-			// index: spo, sop, pso, pos, osp and ops
-			
-			// get the right index
-			int[] selectedIndeces = null;
-			int selectedIndex = -1;
-
-			for (int i = 0; i < 3; i++) {
-				// this should be true once or twice, not more not less
-				if (pathern[i] != 0) {
-					// this should be true the first time
-					if (selectedIndeces == null) {
-						selectedIndeces = indexSelection[i];
-					}
-					selectedIndex = selectedIndeces[i];
-				}
+		if (resultSetIndex != null) {
+			Node s, p, o;
+			for (long[] result : resultSetIndex) {
+				// should get full Nodes from reverse Dictionary
+				s = dict.getNode(result[0]);
+				p = dict.getNode(result[1]);
+				o = dict.getNode(result[2]);
+				resultSet.add(new Triple(s, p, o));
 			}
-
-			if (selectedIndex >= 0) {
-				List<long[]> resultSetIndex = indices[selectedIndex]
-						.getTriples(pathern);
-				if (resultSetIndex != null) {
-					Node s, p, o;
-					for (long[] result : resultSetIndex) {
-						// should get full Nodes from reverse Dictionary
-						s = dict.getNode(result[0]);
-						p = dict.getNode(result[1]);
-						o = dict.getNode(result[2]);
-						resultSet.add(new Triple(s, p, o));
-					}
-					// return resultSet;
-				}
-				// else empty
-			} else {
-				throw new Exception(
-						"This is a bug in the code, please report this Exception to arndtn@gmail.com: order: "
-								+ fixedNum
-								+ " pathern: s("
-								+ pathern[0]
-								+ "), p("
-								+ pathern[1]
-								+ "), o("
-								+ pathern[2]
-								+ ")");
-			}
-			break;
 		}
 		return resultSet;
 	}
@@ -177,9 +128,13 @@ public class Hexastore implements Store {
 
 	}
 
-	public List<Triple> export() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Triple> export() throws Exception {
+		Node s, p, o;
+		s = new Node("?s");
+		p = new Node("?p");
+		o = new Node("?o");
+		Triple triple = new Triple(s, p, o);
+		return query(triple);
 	}
 
 	/**
