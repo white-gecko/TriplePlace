@@ -137,8 +137,8 @@ public class TriplePlaceActivity extends Activity {
 				s = hx.getNode("<http://0.eu>");
 				//p = hx.getNode("<http://xmlns.com/foaf/0.1/0,0>");
 				//p = hx.getNode("<http://xmlns.com/foaf/0.1/0,1>");
-				p = hx.getNode("?p");
-				o = hx.getNode("?o");
+				p = hx.getNode("<http://xmlns.com/foaf/0.1/0,1>");
+				o = hx.getNode("\"Name0,1,1\"");
 				Log.v(TAG, "Ask for s=" + s.getNodeString() + " p=" + p.getNodeString() + " o=" + o.getNodeString());
 				triple = new Triple(s, p, o);
 				result = hx.query(triple);
@@ -146,9 +146,9 @@ public class TriplePlaceActivity extends Activity {
 
 				s = hx.getNode("<http://0.eu>");
 				//p = hx.getNode("<http://xmlns.com/foaf/0.1/0,0>");
-				p = hx.getNode("<http://xmlns.com/foaf/0.1/0,1>");
+				p = hx.getNode("?p");
 				//p = new Node(0);
-				o = hx.getNode("?o");
+				o = hx.getNode("\"Name0,1,1\"");
 				Log.v(TAG, "Ask for s=" + s.getNodeString() + " p=" + p.getNodeString() + " o=" + o.getNodeString());
 				triple = new Triple(s, p, o);
 				result2 = hx.query(triple);
@@ -217,7 +217,7 @@ public class TriplePlaceActivity extends Activity {
 				for (int i = 0; i < (count); i++) {
 					s = hx.getNode("<http://" + i + ".eu>");
 					for (int j = 0; j < 2; j++) {
-						p = hx.getNode("<http://xmlns.com/foaf/0.1/" + i + ","
+						p = hx.getNode("<http://xmlns.com/foaf/0.1/" + (i%100) + ","
 								+ j + ">");
 						for (int k = 0; k < 2; k++) {
 							o = hx.getNode("\"Name" + i + "," + j + "," + k
