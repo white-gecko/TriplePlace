@@ -44,6 +44,15 @@ public class Util {
 	public static long[] unpackLongs(byte[] bytes) {
 		return unpackLongs(bytes, false);
 	}
+
+	public static long[] unpackLongs(byte[] bytes, int[] order) {
+		long[] longs = new long[(bytes.length / 8)];
+		ByteBuffer buffer = ByteBuffer.wrap(bytes);
+		for (int i : order) {
+			longs[i] = buffer.getLong();
+		}
+		return longs;
+	}
 	
 	public static long[] unpackLongs(byte[] bytes, boolean verbous) {
 		long[] longs = new long[(bytes.length / 8)];
