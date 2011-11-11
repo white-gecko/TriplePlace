@@ -1,0 +1,8 @@
+=== TriplePlace ===
+
+This is TriplePlace a light weight and flexible Triple Store for Android.
+It uses a indexing structure similar to the one in [Hexastore].
+TriplePlace uses [TokyoCabinet] as persistent storage system.
+
+[Hexastore] http://www.zora.uzh.ch/8938/2/hexastore.pdf
+[TokyoCabinet] http://fallabs.com/tokyocabinet/
