@@ -7,7 +7,7 @@
   <property name="bin" location="bin" />
 
   <target name="jar">
-    <jar destfile="bin/TriplePlace.jar" basedir="bin/">
+    <jar destfile="bin/TriplePlace.jar" basedir="bin/classes/">
       <!-- replace 'com' by what ever you are using -->
       <!-- as first part of the package name -->
       <!-- e.g. de, org, ... -->
