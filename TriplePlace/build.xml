@@ -1,0 +1,20 @@
+<project name="TriplePlace" default="jar" basedir=".">
+  <description>
+	This is the TriplePlace lib
+  </description>
+  <!-- set global properties for this build -->
+  <property name="src" location="src" />
+  <property name="bin" location="bin" />
+
+  <target name="jar">
+    <jar destfile="bin/TriplePlace.jar" basedir="bin/">
+      <!-- replace 'com' by what ever you are using -->
+      <!-- as first part of the package name -->
+      <!-- e.g. de, org, ... -->
+      <!-- the ** is important to include the directory recursively -->
+      <include name="org/**" />
+      <exclude name="org/aksw/tripleplace/ui/"/>
+      <include name="tokyocabinet/**" />
+    </jar>
+  </target>
+</project>
