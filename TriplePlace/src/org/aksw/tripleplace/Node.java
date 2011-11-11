@@ -67,29 +67,29 @@ public class Node {
 		
 		switch (nodeString.charAt(0)) {
 		case '<':
-			// Resource
+			// Resource '<http://example.com>'
 			type = TYPE_NAMED_RESOURCE;
 			value = nodeString.substring(1, length - 1);
 			//Log.d(TAG, "Type " + type + " value: \"" + value + "\"");
 			return;
 		case '_':
-			// BNode
+			// BNode '_:abc'
 			type = TYPE_BLANK_RESOURCE;
 			value = nodeString.substring(2, length);
 			//Log.d(TAG, "Type " + type + " value: \"" + value + "\"");
 			return;
 		case '?':
-			// Variable
+			// Variable '?a'
 			type = TYPE_VARIABLE;
 			value = nodeString.substring(1, length);
 			//Log.d(TAG, "Type " + type + " value: \"" + value + "\"");
 			return;
 		case '"':
-			// Literal
+			// Literal '"String"'
 			int split;
 			switch (nodeString.charAt(length - 1)) {
 			case '>':
-				// Typed Literal
+				// Typed Literal '"String"^^<http://...>'
 				type = TYPE_TYPED_LITERAL;
 				split = nodeString.lastIndexOf("\"^^<");
 				if (split < 0) {
@@ -103,13 +103,13 @@ public class Node {
 				//Log.d(TAG, "Type " + type + " value: \"" + value + "\", dataType: \"" + dataType + "\"");
 				return;
 			case '"':
-				// Literal
+				// Literal '"String"'
 				type = TYPE_LITERAL;
 				value = nodeString.substring(1, length - 1);
 				//Log.d(TAG, "Type " + type + " value: \"" + value + "\"");
 				return;
 			default:
-				// Language Literal
+				// Language Literal '"String"@de'
 				type = TYPE_LANG_LITERAL;
 				split = nodeString.lastIndexOf("\"@");
 				if (split < 0) {
