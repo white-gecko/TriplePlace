@@ -1,66 +1,83 @@
 package org.aksw.tripleplace.hexastore;
 
-import java.nio.ByteBuffer;
-
 import android.util.Log;
 
 public class Util {
-	public static byte[] packLong(long[] numbers) {
-		ByteBuffer buffer = ByteBuffer.allocate(numbers.length * 8);
-		for (long number : numbers) {
-			buffer.putLong(number);
+	
+	public static byte[] packLong(long[] number) {
+		byte[] data = new byte[8*number.length];
+
+		for (int i = 0; i < number.length; i++) {
+			for (int j = 0; j < 8; j++) {
+				data[(i*8) + (7 - j)] = (byte) (number[i] >>> (j * 8));
+			}
 		}
-		return buffer.array();
+		return data;
+	}	
+	
+	public static byte[] packLong(long[] number, int[] order) {
+		byte[] data = new byte[8*number.length];
+
+		for (int i = 0; i < number.length; i++) {
+			for (int j = 0; j < 8; j++) {
+				data[(i*8) + (7 - j)] = (byte) (number[order[i]] >>> (j * 8));
+			}
+		}
+		return data;
 	}
 
-	public static byte[] packLong(long[] numbers, int[] order) {
-		ByteBuffer buffer = ByteBuffer.allocate(numbers.length * 8);
-		for (int i : order) {
-			buffer.putLong(numbers[i]);
-		}
-		return buffer.array();
-	}
-	
 	public static byte[] packLong(long number) {
-		ByteBuffer buffer = ByteBuffer.allocate(8);
-		buffer.putLong(number);
-		return buffer.array();
-	}
-	
-	public static long unpackLong(byte[] bytes) {
-		return unpackLong(bytes, false);
-	}
-	
-	public static long unpackLong(byte[] bytes, boolean verbous) {
-		ByteBuffer buffer = ByteBuffer.wrap(bytes);
-		if (verbous) {
-			long l = buffer.getLong();
-			Log.v("Util", "long(" + bytes.length + "): " + l);
-			return l;
+		byte[] data = new byte[8];
+		for (int i = 0; i < data.length; i++) {
+			data[7 - i] = (byte) (number >>> (i * 8));
 		}
-		return buffer.getLong();
+		return data;
 	}
 
-	public static long[] unpackLongs(byte[] bytes) {
-		return unpackLongs(bytes, false);
+	public static long unpackLong(byte[] data) {
+		return unpackLong(data, false);
 	}
 
-	public static long[] unpackLongs(byte[] bytes, int[] order) {
-		long[] longs = new long[(bytes.length / 8)];
-		ByteBuffer buffer = ByteBuffer.wrap(bytes);
-		for (int i : order) {
-			longs[i] = buffer.getLong();
+	public static long unpackLong(byte[] data, boolean verbous) {
+		long l = 0;
+		for (int i = 0; i < data.length; i++) {
+			l = (l << 8) + (data[i] & 0xff);
+		}
+		if (verbous) {
+			Log.v("Util", "long(" + data.length + "): " + l);
+		}
+
+		return l;
+	}
+
+	public static long[] unpackLongs(byte[] data) {
+		return unpackLongs(data, false);
+	}
+
+	public static long[] unpackLongs(byte[] data, int[] order) {
+		long[] longs = new long[(data.length / 8)];
+
+		for (int i = 0; i < longs.length; i++) {
+			long l = 0;
+			for (int j = 0; j < 8; j++) {
+				l = (l << 8) + (data[(i * 8) + j] & 0xff);
+			}
+			longs[order[i]] = l;
 		}
 		return longs;
 	}
-	
-	public static long[] unpackLongs(byte[] bytes, boolean verbous) {
-		long[] longs = new long[(bytes.length / 8)];
-		ByteBuffer buffer = ByteBuffer.wrap(bytes);
+
+	public static long[] unpackLongs(byte[] data, boolean verbous) {
+		long[] longs = new long[(data.length / 8)];
+
 		for (int i = 0; i < longs.length; i++) {
-			longs[i] = buffer.getLong();
+			long l = 0;
+			for (int j = 0; j < 8; j++) {
+				l = (l << 8) + (data[(i * 8) + j] & 0xff);
+			}
+			longs[i] = l;
 			if (verbous) {
-				Log.v("Util", "long(" + i + "," + bytes.length + "): " + longs[i]);
+				Log.v("Util", "long(" + data.length + "): " + l);
 			}
 		}
 		return longs;
