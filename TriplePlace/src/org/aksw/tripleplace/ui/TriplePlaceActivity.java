@@ -1,13 +1,16 @@
 package org.aksw.tripleplace.ui;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import org.aksw.tripleplace.Node;
 import org.aksw.tripleplace.R;
 import org.aksw.tripleplace.Triple;
 import org.aksw.tripleplace.hexastore.Hexastore;
+import org.aksw.tripleplace.hexastore.Index;
 import org.aksw.tripleplace.hexastore.Util;
 
 import tokyocabinet.BDB;
@@ -15,6 +18,7 @@ import tokyocabinet.BDBCUR;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -26,6 +30,8 @@ import android.widget.TextView;
 public class TriplePlaceActivity extends Activity {
 	private static final String TAG = "TriplePlaceActivity";
 
+	protected long aGes = 0, bGes = 0;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -35,13 +41,16 @@ public class TriplePlaceActivity extends Activity {
 
 		TextView text = (TextView) this.findViewById(R.id.hello);
 		Button insertButton = (Button) this.findViewById(R.id.startInsert);
-		Button insertSmallButton = (Button) this.findViewById(R.id.startInsertSmall);
+		Button insertSmallButton = (Button) this
+				.findViewById(R.id.startInsertSmall);
 		Button queryButton = (Button) this.findViewById(R.id.startQuery);
+		Button longTestButton = (Button) this.findViewById(R.id.longTest);
 		Handler handler = new MyHandler(text);
 
 		insertButton.setOnClickListener(new InsertClick(handler));
 		insertSmallButton.setOnClickListener(new InsertSmallClick(handler));
 		queryButton.setOnClickListener(new QueryClick(handler));
+		longTestButton.setOnClickListener(new LongToByteClick(text));
 	}
 
 	private class MyHandler extends Handler {
@@ -62,6 +71,44 @@ public class TriplePlaceActivity extends Activity {
 		}
 	}
 
+	private class LongToByteClick implements OnClickListener {
+
+		private TextView text;
+
+		public LongToByteClick(TextView text) {
+			this.text = text;
+		}
+
+		public void onClick(View v) {
+			text.setText("läuft ...");
+			byte[] data = new byte[24];
+			Random rand = new Random();
+			long start, end, a, b;
+			long[] numbers;
+			byte[] aB, bB;
+			start = System.currentTimeMillis();
+			for (int j = 0; j < 100; j++) {
+				rand.nextBytes(data);
+				numbers = Util.unpackLongs(data, false);
+				aB = Util.packLong(numbers, Index.ORDER_PSO);
+			}
+			end = System.currentTimeMillis() - start;
+			a = end;
+			start = System.currentTimeMillis();
+			for (int j = 0; j < 100; j++) {
+				rand.nextBytes(data);
+				//Util.unpackLongsO(data, false);
+			}
+			end = System.currentTimeMillis() - start;
+			b = end;
+			aGes += a;
+			bGes += b;
+			text.setText("lsame. a(new): " + a + ", b(old): " + b + "ges a:b: "
+					+ aGes + ":" + bGes + " win: "
+					+ ((aGes < bGes) ? "A" : "B"));
+		}
+	}
+
 	private class InsertClick implements OnClickListener {
 
 		private Handler handler;
@@ -72,7 +119,7 @@ public class TriplePlaceActivity extends Activity {
 
 		public void onClick(View v) {
 			String path = getFilesDir().getAbsolutePath();
-			HexaBenchmarkInsert b = new HexaBenchmarkInsert(1000, path, handler);
+			HexaBenchmarkInsert b = new HexaBenchmarkInsert(40, path, handler);
 			b.start();
 
 			handler.sendMessage(handler.obtainMessage(1, "insert läuft ..."));
@@ -132,59 +179,40 @@ public class TriplePlaceActivity extends Activity {
 			start = System.currentTimeMillis();
 
 			List<Triple> result = null;
-			List<Triple> result2 = null;
 			try {
+				// s = hx.getNode("<http://xmlns.com/foaf/0.1/0,0>");
 				s = hx.getNode("<http://0.eu>");
-				//p = hx.getNode("<http://xmlns.com/foaf/0.1/0,0>");
-				//p = hx.getNode("<http://xmlns.com/foaf/0.1/0,1>");
-				p = hx.getNode("<http://xmlns.com/foaf/0.1/0,1>");
-				o = hx.getNode("\"Name0,1,1\"");
-				Log.v(TAG, "Ask for s=" + s.getNodeString() + " p=" + p.getNodeString() + " o=" + o.getNodeString());
+				// p = hx.getNode("<http://xmlns.com/foaf/0.1/0,0>");
+				p = hx.getNode("?p");
+				// p = new Node(0);
+				o = hx.getNode("?o");
+				// Log.v(TAG, "Ask for s=" + s.getNodeString() + " p=" +
+				// p.getNodeString() + " o=" + o.getNodeString());
 				triple = new Triple(s, p, o);
 				result = hx.query(triple);
-				
 
-				s = hx.getNode("<http://0.eu>");
-				//p = hx.getNode("<http://xmlns.com/foaf/0.1/0,0>");
-				p = hx.getNode("?p");
-				//p = new Node(0);
-				o = hx.getNode("\"Name0,1,1\"");
-				Log.v(TAG, "Ask for s=" + s.getNodeString() + " p=" + p.getNodeString() + " o=" + o.getNodeString());
-				triple = new Triple(s, p, o);
-				result2 = hx.query(triple);
-				
 			} catch (IOException e) {
 				Log.e(TAG, "Exception on querying Triples", e);
 			} catch (Exception e) {
 				Log.e(TAG, "Exception on querying Triples", e);
 			}
 			end = (System.currentTimeMillis() - start);
-			
+
+			Debug.MemoryInfo memInfo = new Debug.MemoryInfo();
+			Debug.getMemoryInfo(memInfo);
+
 			if (result != null) {
 
-				for (Triple triple2 : result) {
-					Node[] nodes = triple2.getNodes();
-					Log.v(TAG, "Got Triple s=" + nodes[0].getNodeString() + " p=" + nodes[1].getNodeString() + " o=" + nodes[2].getNodeString());
-				}
-				
+				/*
+				 * for (Triple triple2 : result) { Node[] nodes =
+				 * triple2.getNodes(); Log.v(TAG, "Got Triple s=" +
+				 * nodes[0].getNodeString() + " p=" + nodes[1].getNodeString() +
+				 * " o=" + nodes[2].getNodeString()); }
+				 */
+
 				handler.sendMessage(handler.obtainMessage(1, "Query: In " + end
 						+ " ms, das sind " + (end / 1000) + " s und "
 						+ (end / 1000) / 60 + " min done. Got " + result.size()
-						+ ""));
-			} else {
-				handler.sendMessage(handler.obtainMessage(1,
-						"Got null on querying"));
-			}
-			
-			if (result2 != null) {
-				for (Triple triple2 : result2) {
-					Node[] nodes = triple2.getNodes();
-					Log.v(TAG, "Got Triple2 s=" + nodes[0].getNodeString() + " p=" + nodes[1].getNodeString() + " o=" + nodes[2].getNodeString());
-				}
-				
-				handler.sendMessage(handler.obtainMessage(1, "Query: In " + end
-						+ " ms, das sind " + (end / 1000) + " s und "
-						+ (end / 1000) / 60 + " min done. Got " + result2.size()
 						+ ""));
 			} else {
 				handler.sendMessage(handler.obtainMessage(1,
@@ -209,20 +237,20 @@ public class TriplePlaceActivity extends Activity {
 			Hexastore hx = new Hexastore(path);
 
 			Node s, p, o;
-			ArrayList<Triple> tripleList = new ArrayList<Triple>();
+			// ArrayList<Triple> tripleList = new ArrayList<Triple>();
 
-			long start, end, nodes, triples;
+			long start, end;
 			start = System.currentTimeMillis();
 			try {
 				for (int i = 0; i < (count); i++) {
 					s = hx.getNode("<http://" + i + ".eu>");
-					for (int j = 0; j < 2; j++) {
-						p = hx.getNode("<http://xmlns.com/foaf/0.1/" + (i%100) + ","
+					for (int j = 0; j < 10; j++) {
+						p = hx.getNode("<http://xmlns.com/foaf/0.1/" + i + ","
 								+ j + ">");
-						for (int k = 0; k < 2; k++) {
+						for (int k = 0; k < 10; k++) {
 							o = hx.getNode("\"Name" + i + "," + j + "," + k
 									+ "\"");
-							tripleList.add(new Triple(s, p, o));
+							hx.addTriple(new Triple(s, p, o));
 						}
 					}
 				}
@@ -230,94 +258,94 @@ public class TriplePlaceActivity extends Activity {
 				Log.e(TAG, "Couldn't create new Node", e);
 			}
 
-			nodes = (System.currentTimeMillis() - start);
-			Log.v("Benchmark", "Status(" + nodes + ") " + tripleList.size() + " nodes done");
-
-			try {
-				// TODO Auto-generated catch block
-				for (Triple triple : tripleList) {
-					hx.addTriple(triple);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
 			end = (System.currentTimeMillis() - start);
-			triples = (end - nodes);
-			
-			Log.v("Benchmark", "Status(" + triples + ") triples done");
+			Debug.MemoryInfo memInfo = new Debug.MemoryInfo();
+			Debug.getMemoryInfo(memInfo);
+			Log.v(TAG, "MemInfo: " + memInfo.dalvikPrivateDirty + ", "
+					+ memInfo.dalvikPss + ", " + memInfo.dalvikSharedDirty
+					+ " - " + memInfo.nativePrivateDirty + ", "
+					+ memInfo.nativePss + ", " + memInfo.nativeSharedDirty);
+
 			Log.v("Benchmark", "Status(" + end + ") done");
 
-			handler.sendMessage(handler.obtainMessage(1, "Status " + count * 2
-					* 2 + " Tripel in " + end + " ms hinzugefügt, das sind "
-					+ (end / 1000) + " s und " + (end / 1000) / 60
-					+ " min done. Nodes: " + nodes + " ms (" + (nodes / 1000)
-					+ " s), Triples: " + triples + " ms (" + (triples / 1000)
-					+ " s)."));
+			handler.sendMessage(handler.obtainMessage(1, "Status " + count
+					* 100 * 10 + " Tripel in " + end
+					+ " ms hinzugefügt, das sind " + (end / 1000) + " s und "
+					+ (end / 1000) / 60 + " min done."));
+
+			Log.v(TAG, "MemInfo: " + memInfo.dalvikPrivateDirty + ", "
+					+ memInfo.dalvikPss + ", " + memInfo.dalvikSharedDirty
+					+ " - " + memInfo.nativePrivateDirty + ", "
+					+ memInfo.nativePss + ", " + memInfo.nativeSharedDirty);
+
+			Debug.getMemoryInfo(memInfo);
+			Log.v(TAG, "MemInfo: " + memInfo.dalvikPrivateDirty + ", "
+					+ memInfo.dalvikPss + ", " + memInfo.dalvikSharedDirty
+					+ " - " + memInfo.nativePrivateDirty + ", "
+					+ memInfo.nativePss + ", " + memInfo.nativeSharedDirty);
 		}
 	}
-	
-	public void lol(){
 
+	public void lol() {
 
 		String path = getFilesDir().getAbsolutePath();
-		
-	    // create the object
-	    BDB bdb = new BDB();
 
-	    // open the database
+		// create the object
+		BDB bdb = new BDB();
+
+		// open the database
 
 		// set comparator to 64bit int
-		//bdb.setcmpfunc(BDB.CMPINT64);
+		// bdb.setcmpfunc(BDB.CMPINT64);
 		// set database to use 64bit int bucket-arrays which allows the
 		// DB to get larger than 2GB
 		bdb.tune(-1, -1, -1, -1, -1, BDB.TLARGE);
-	    if(!bdb.open(path + "/casket.tcb", BDB.OWRITER | BDB.OCREAT)){
-	      int ecode = bdb.ecode();
-	      System.err.println("open error: " + BDB.errmsg(ecode));
-	    }
+		if (!bdb.open(path + "/casket.tcb", BDB.OWRITER | BDB.OCREAT)) {
+			int ecode = bdb.ecode();
+			System.err.println("open error: " + BDB.errmsg(ecode));
+		}
 
-	    byte[] key1 = Util.packLong(new long[] {-7095513297421747150L,-3846273158350191334L});
-	    byte[] key2 = Util.packLong(new long[] {-7095513297421747150L,-403445358534883849L});
-	    byte[] o1 = Util.packLong(-8441093956662597840L);
-	    byte[] o2 = Util.packLong(-2483864365444698929L);
-	    byte[] o3 = Util.packLong(-2483884365444698929L);
-	    byte[] o4 = Util.packLong(-4398598216062786538L);
-	    
-	    
-	    // store records
-	    if(!bdb.putdup(key1, o1) ||
-	       !bdb.putdup(key1, o2) ||
-	       !bdb.putdup(key2, o3) ||
-	       !bdb.putdup(key2, o4)){
-	      int ecode = bdb.ecode();
-	      System.err.println("put error: " + BDB.errmsg(ecode));
-	    }
+		byte[] key1 = Util.packLong(new long[] { -7095513297421747150L,
+				-3846273158350191334L });
+		byte[] key2 = Util.packLong(new long[] { -7095513297421747150L,
+				-403445358534883849L });
+		byte[] o1 = Util.packLong(-8441093956662597840L);
+		byte[] o2 = Util.packLong(-2483864365444698929L);
+		byte[] o3 = Util.packLong(-2483884365444698929L);
+		byte[] o4 = Util.packLong(-4398598216062786538L);
 
-	    // retrieve records
-	    byte[] value = bdb.get(key1);
-	    if(value != null){
-	      System.out.println(Util.unpackLong(value));
-	    } else {
-	      int ecode = bdb.ecode();
-	      System.err.println("get error: " + BDB.errmsg(ecode));
-	    }
+		// store records
+		if (!bdb.putdup(key1, o1) || !bdb.putdup(key1, o2)
+				|| !bdb.putdup(key2, o3) || !bdb.putdup(key2, o4)) {
+			int ecode = bdb.ecode();
+			System.err.println("put error: " + BDB.errmsg(ecode));
+		}
 
-	    // traverse records
-	    BDBCUR cur = new BDBCUR(bdb);
-	    cur.first();
-	    byte[] key;
-	    while((key = cur.key()) != null){
-	      value = cur.val();
-	      if(value != null){
-	    	 long[] keys = Util.unpackLongs(key);
-	        System.out.println(keys[0] + "," + keys[1] + ":" + Util.unpackLong(value));
-	      }
-	      cur.next();
-	    }
+		// retrieve records
+		byte[] value = bdb.get(key1);
+		if (value != null) {
+			System.out.println(Util.unpackLong(value));
+		} else {
+			int ecode = bdb.ecode();
+			System.err.println("get error: " + BDB.errmsg(ecode));
+		}
 
-	    key = Util.packLong(new long[] {-7095513297421747150L});
-	    
+		// traverse records
+		BDBCUR cur = new BDBCUR(bdb);
+		cur.first();
+		byte[] key;
+		while ((key = cur.key()) != null) {
+			value = cur.val();
+			if (value != null) {
+				long[] keys = Util.unpackLongs(key);
+				System.out.println(keys[0] + "," + keys[1] + ":"
+						+ Util.unpackLong(value));
+			}
+			cur.next();
+		}
+
+		key = Util.packLong(new long[] { -7095513297421747150L });
+
 		List<byte[]> keys = bdb.fwmkeys(key, -1); // -1 means
 													// no limit
 		Log.v(TAG, "Got " + keys.size() + " keys in range");
@@ -325,12 +353,12 @@ public class TriplePlaceActivity extends Activity {
 			Util.unpackLongs(bs, true);
 		}
 
-	    // close the database
-	    if(!bdb.close()){
-	      int ecode = bdb.ecode();
-	      System.err.println("close error: " + BDB.errmsg(ecode));
-	    }
+		// close the database
+		if (!bdb.close()) {
+			int ecode = bdb.ecode();
+			System.err.println("close error: " + BDB.errmsg(ecode));
+		}
 
-	  }
+	}
 
 }
