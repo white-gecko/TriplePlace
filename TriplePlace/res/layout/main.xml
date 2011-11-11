@@ -12,4 +12,5 @@
     <Button android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="Start Insert" android:id="@+id/startInsert"/>
     <Button android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="Start Insert Small" android:id="@+id/startInsertSmall"/>
     <Button android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="Start Query" android:id="@+id/startQuery"/>
+    <Button android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="Long test" android:id="@+id/longTest"/>
 </LinearLayout>
