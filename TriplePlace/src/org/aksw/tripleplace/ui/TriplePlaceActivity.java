@@ -1,21 +1,16 @@
 package org.aksw.tripleplace.ui;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import org.aksw.tripleplace.Node;
 import org.aksw.tripleplace.R;
 import org.aksw.tripleplace.Triple;
 import org.aksw.tripleplace.hexastore.Hexastore;
-import org.aksw.tripleplace.hexastore.Index;
 import org.aksw.tripleplace.hexastore.Util;
 
 import tokyocabinet.BDB;
 import tokyocabinet.BDBCUR;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Debug;
@@ -41,16 +36,11 @@ public class TriplePlaceActivity extends Activity {
 
 		TextView text = (TextView) this.findViewById(R.id.hello);
 		Button insertButton = (Button) this.findViewById(R.id.startInsert);
-		Button insertSmallButton = (Button) this
-				.findViewById(R.id.startInsertSmall);
 		Button queryButton = (Button) this.findViewById(R.id.startQuery);
-		Button longTestButton = (Button) this.findViewById(R.id.longTest);
 		Handler handler = new MyHandler(text);
 
 		insertButton.setOnClickListener(new InsertClick(handler));
-		insertSmallButton.setOnClickListener(new InsertSmallClick(handler));
 		queryButton.setOnClickListener(new QueryClick(handler));
-		longTestButton.setOnClickListener(new LongToByteClick(text));
 	}
 
 	private class MyHandler extends Handler {
@@ -71,44 +61,6 @@ public class TriplePlaceActivity extends Activity {
 		}
 	}
 
-	private class LongToByteClick implements OnClickListener {
-
-		private TextView text;
-
-		public LongToByteClick(TextView text) {
-			this.text = text;
-		}
-
-		public void onClick(View v) {
-			text.setText("läuft ...");
-			byte[] data = new byte[24];
-			Random rand = new Random();
-			long start, end, a, b;
-			long[] numbers;
-			byte[] aB, bB;
-			start = System.currentTimeMillis();
-			for (int j = 0; j < 100; j++) {
-				rand.nextBytes(data);
-				numbers = Util.unpackLongs(data, false);
-				aB = Util.packLong(numbers, Index.ORDER_PSO);
-			}
-			end = System.currentTimeMillis() - start;
-			a = end;
-			start = System.currentTimeMillis();
-			for (int j = 0; j < 100; j++) {
-				rand.nextBytes(data);
-				//Util.unpackLongsO(data, false);
-			}
-			end = System.currentTimeMillis() - start;
-			b = end;
-			aGes += a;
-			bGes += b;
-			text.setText("lsame. a(new): " + a + ", b(old): " + b + "ges a:b: "
-					+ aGes + ":" + bGes + " win: "
-					+ ((aGes < bGes) ? "A" : "B"));
-		}
-	}
-
 	private class InsertClick implements OnClickListener {
 
 		private Handler handler;
@@ -120,23 +72,6 @@ public class TriplePlaceActivity extends Activity {
 		public void onClick(View v) {
 			String path = getFilesDir().getAbsolutePath();
 			HexaBenchmarkInsert b = new HexaBenchmarkInsert(40, path, handler);
-			b.start();
-
-			handler.sendMessage(handler.obtainMessage(1, "insert läuft ..."));
-		}
-	}
-
-	private class InsertSmallClick implements OnClickListener {
-
-		private Handler handler;
-
-		public InsertSmallClick(Handler handler) {
-			this.handler = handler;
-		}
-
-		public void onClick(View v) {
-			String path = getFilesDir().getAbsolutePath();
-			HexaBenchmarkInsert b = new HexaBenchmarkInsert(1, path, handler);
 			b.start();
 
 			handler.sendMessage(handler.obtainMessage(1, "insert läuft ..."));
