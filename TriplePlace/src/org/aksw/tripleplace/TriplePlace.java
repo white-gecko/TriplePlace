@@ -18,7 +18,7 @@ public class TriplePlace implements Store {
 		}
 	}
 	
-	public void addTriple(Triple triple) throws IOException {
+	public void addTriple(Triple triple) throws Exception {
 		store.addTriple(triple);
 	}
 

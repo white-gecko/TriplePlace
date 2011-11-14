@@ -37,12 +37,16 @@ public class Hexastore implements Store {
 	 * @param triple
 	 *            the Triple which should be added to the model
 	 */
-	public void addTriple(Triple triple) throws IOException {
+	public void addTriple(Triple triple) throws Exception {
 
 		Node[] nodes = triple.getNodes();
 		long[] nodeIds = new long[nodes.length];
 
 		for (int i = 0; i < nodes.length; i++) {
+			if (nodes[i] == null) {
+				throw new Exception("Can't add a triple with null as Node");
+			}
+			
 			if (nodes[i].getId() == 0) {
 				// add Node to dictionary
 				try {
@@ -90,6 +94,14 @@ public class Hexastore implements Store {
 		// find out which parts are unbound
 		Node[] nodes = triple.getNodes();
 		long[] pathern = new long[nodes.length];
+
+		for (int i = 0; i < nodes.length; i++) {
+			if (nodes[i] != null) {
+				pathern[i] = nodes[i].getId();
+			} else {
+				pathern[i] = 0;
+			}
+		}
 
 		// get the right index
 		int[] selectedIndeces = null;
