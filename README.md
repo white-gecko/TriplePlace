@@ -13,7 +13,7 @@ TriplePlace is distributed in the hope that it will be useful, but WITHOUT ANY W
 warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with TriplePlace.
-If not, see <http://www.gnu.org/licenses/>.
+If not, see <[http://www.gnu.org/licenses/](http://www.gnu.org/licenses/)>.
 
 To be done/To be implemented
 ----------
