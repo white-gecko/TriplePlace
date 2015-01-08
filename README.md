@@ -3,7 +3,7 @@ TriplePlace
 
 This is TriplePlace a light weight and flexible Triple Store for Android. It uses a indexing structure similar to the
 one in [Hexastore](http://www.zora.uzh.ch/8938/2/hexastore.pdf). TriplePlace uses
-[TokyoCabinet](http://fallabs.com/tokyocabinet/) as persistent storage system.
+[TokyoCabinet](http://fallabs.com/tokyocabinet/) as persistent storage system. I've also published a patched version of [TokyoCabinet](https://github.com/white-gecko/TokyoCabinet) and TokyoCabinet-Java-API resp. [TokyoCabinet-Android-API](https://github.com/white-gecko/TokyoCabinet-Android-API).
 
 TriplePlace is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
 License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
